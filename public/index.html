@@ -197,6 +197,99 @@
 <!-- DATA + LOGIC                                               -->
 <!-- ═══════════════════════════════════════════════════════════ -->
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+// ─── Data ────────────────────────────────────────────────────
+const DATA = {
+  buildings: [
+    { id:"b1", name:"Λεωφ. Συγγρού 42", address:"Λεωφόρος Συγγρού 42, Αθήνα", floors:6, totalMillesimal:1000, hasElevator:true, hasCentralHeating:true,
+      units:[
+        {id:"u1",label:"1Α",floor:1,type:"apartment",sqm:72,mill:85,tenant:{name:"Γιώργος Παπαδόπουλος",email:"g.papadopoulos@email.gr",phone:"6971234567",role:"renter"},occupied:true},
+        {id:"u2",label:"1Β",floor:1,type:"apartment",sqm:65,mill:78,tenant:{name:"Μαρία Κωνσταντίνου",email:"m.konstantinou@email.gr",phone:"6982345678",role:"owner"},occupied:true},
+        {id:"u3",label:"2Α",floor:2,type:"apartment",sqm:72,mill:85,tenant:{name:"Νίκος Αλεξίου",email:"n.alexiou@email.gr",phone:"6993456789",role:"renter"},occupied:true},
+        {id:"u4",label:"2Β",floor:2,type:"apartment",sqm:65,mill:78,tenant:{name:"Ελένη Δημητρίου",email:"e.dimitriou@email.gr",phone:"6944567890",role:"renter"},occupied:true},
+        {id:"u5",label:"3Α",floor:3,type:"apartment",sqm:80,mill:95,tenant:{name:"Κώστας Βασιλείου",email:"k.vasiliou@email.gr",phone:"6975678901",role:"owner"},occupied:true},
+        {id:"u6",label:"3Β",floor:3,type:"apartment",sqm:58,mill:68,tenant:null,occupied:false},
+        {id:"u7",label:"4Α",floor:4,type:"apartment",sqm:90,mill:110,tenant:{name:"Αναστασία Γεωργίου",email:"a.georgiou@email.gr",phone:"6986789012",role:"renter"},occupied:true},
+        {id:"u8",label:"4Β",floor:4,type:"apartment",sqm:65,mill:78,tenant:{name:"Δημήτρης Νικολάου",email:"d.nikolaou@email.gr",phone:"6937890123",role:"owner"},occupied:true},
+        {id:"u9",label:"5Α",floor:5,type:"apartment",sqm:95,mill:115,tenant:{name:"Σοφία Ιωάννου",email:"s.ioannou@email.gr",phone:"6948901234",role:"renter"},occupied:true},
+        {id:"u10",label:"Ισόγειο",floor:0,type:"shop",sqm:120,mill:108,tenant:{name:"Ανδρέας Χρήστου",email:"a.christou@email.gr",phone:"6959012345",role:"renter"},occupied:true},
+      ],
+      expenses:[
+        {cat:"Ηλεκτρικό κοινοχρήστων",desc:"ΔΕΗ Φεβ 2026",amount:342.50},
+        {cat:"Καθαρισμός",desc:"Μηνιαίο — Φεβ",amount:180},
+        {cat:"Ασανσέρ — Συντήρηση",desc:"Τριμηνιαία συντ.",amount:150},
+        {cat:"Νερό κοινόχρηστο",desc:"ΕΥΔΑΠ Φεβ 2026",amount:95.20},
+        {cat:"Ασφάλεια κτιρίου",desc:"Ετήσιο (1/12)",amount:45},
+        {cat:"Αμοιβή διαχειριστή",desc:"Φεβρουάριος",amount:200},
+      ]
+    },
+    { id:"b2", name:"Ερμού 18", address:"Ερμού 18, Νέα Σμύρνη", floors:4, totalMillesimal:1000, hasElevator:false, hasCentralHeating:false,
+      units:[
+        {id:"u11",label:"1ος",floor:1,type:"apartment",sqm:85,mill:180,tenant:{name:"Πέτρος Μακρής",email:"p.makris@email.gr",phone:"6970111222",role:"owner"},occupied:true},
+        {id:"u12",label:"2ος",floor:2,type:"apartment",sqm:85,mill:180,tenant:{name:"Άννα Σταύρου",email:"a.stavrou@email.gr",phone:"6980222333",role:"renter"},occupied:true},
+        {id:"u13",label:"3ος",floor:3,type:"apartment",sqm:90,mill:200,tenant:null,occupied:false},
+        {id:"u14",label:"4ος",floor:4,type:"apartment",sqm:100,mill:250,tenant:{name:"Χρήστος Παντελής",email:"c.pantelis@email.gr",phone:"6990333444",role:"owner"},occupied:true},
+        {id:"u15",label:"Ισόγειο",floor:0,type:"shop",sqm:60,mill:190,tenant:{name:"Καφέ Νέα Σμύρνη ΟΕ",email:"info@cafe-ns.gr",phone:"2109876543",role:"renter"},occupied:true},
+      ],
+      expenses:[
+        {cat:"Ηλεκτρικό κοινοχρήστων",desc:"ΔΕΗ Φεβ 2026",amount:128},
+        {cat:"Καθαρισμός",desc:"Μηνιαίο — Φεβ",amount:120},
+        {cat:"Αμοιβή διαχειριστή",desc:"Φεβρουάριος",amount:150},
+      ]
+    }
+  ],
+  announcements: [
+    {id:"a1",bid:"b1",bname:"Λεωφ. Συγγρού 42",title:"Διακοπή νερού — Τετάρτη 5/3",body:"Λόγω εργασιών της ΕΥΔΑΠ θα γίνει διακοπή νερού την Τετάρτη 5 Μαρτίου από 09:00 έως 14:00. Παρακαλούμε αποθηκεύστε νερό.",priority:"high",pinned:true,date:"2026-03-01T10:00:00"},
+    {id:"a2",bid:"b1",bname:"Λεωφ. Συγγρού 42",title:"Ετήσια γενική συνέλευση",body:"Η ετήσια ΓΣ θα πραγματοποιηθεί την Κυριακή 15/3 στις 18:00 στον κοινόχρηστο χώρο ισογείου.",priority:"normal",pinned:true,date:"2026-02-28T09:00:00"},
+    {id:"a3",bid:"b1",bname:"Λεωφ. Συγγρού 42",title:"Συντήρηση ασανσέρ",body:"Η συντήρηση θα γίνει Δευτέρα 10/3, 10:00-12:00. Το ασανσέρ θα είναι εκτός λειτουργίας.",priority:"normal",pinned:false,date:"2026-02-25T14:00:00"},
+    {id:"a4",bid:"b2",bname:"Ερμού 18",title:"Βλάβη κεντρικής πόρτας",body:"Η κεντρική πόρτα δεν κλείνει αυτόματα. Κλήθηκε τεχνικός. Κλείνετε χειροκίνητα.",priority:"urgent",pinned:true,date:"2026-03-02T16:30:00"},
+    {id:"a5",bid:"b2",bname:"Ερμού 18",title:"Κανονισμός κοινοχρήστων χώρων",body:"Η τοποθέτηση αντικειμένων στα πλατύσκαλα απαγορεύεται.",priority:"low",pinned:false,date:"2026-02-20T11:00:00"},
+  ],
+  maintenance: [
+    {id:"m1",bid:"b1",bname:"Λεωφ. Συγγρού 42",unit:"2Α",title:"Διαρροή νερού στο μπάνιο",desc:"Διαρροή από σωλήνα κάτω από τον νιπτήρα.",status:"in_progress",priority:"high",by:"Νίκος Αλεξίου",date:"2026-02-27",assigned:"Υδραυλικός Κώστα"},
+    {id:"m2",bid:"b1",bname:"Λεωφ. Συγγρού 42",unit:null,title:"Λάμπα καμένη στο κλιμακοστάσιο 3ου",desc:"Η λάμπα στο πλατύσκαλο 3ου ορόφου δεν ανάβει.",status:"submitted",priority:"normal",by:"Κώστας Βασιλείου",date:"2026-03-01",assigned:null},
+    {id:"m3",bid:"b1",bname:"Λεωφ. Συγγρού 42",unit:"4Α",title:"Ρωγμή στον τοίχο σαλονιού",desc:"Ρωγμή στον εξωτερικό τοίχο κοντά στο παράθυρο.",status:"acknowledged",priority:"normal",by:"Αναστασία Γεωργίου",date:"2026-02-28",assigned:null},
+    {id:"m4",bid:"b1",bname:"Λεωφ. Συγγρού 42",unit:null,title:"Θόρυβος ασανσέρ",desc:"Τρίξιμο μεταξύ 3ου και 4ου ορόφου.",status:"resolved",priority:"high",by:"Δημήτρης Νικολάου",date:"2026-02-15",assigned:"ThyssenKrupp Ελλάς"},
+    {id:"m5",bid:"b2",bname:"Ερμού 18",unit:"2ος",title:"Βλάβη θυροτηλεφώνου",desc:"Δεν λειτουργεί κουδούνι ούτε άνοιγμα πόρτας.",status:"in_progress",priority:"high",by:"Άννα Σταύρου",date:"2026-02-26",assigned:"Ηλεκτρολόγος Παπά"},
+    {id:"m6",bid:"b2",bname:"Ερμού 18",unit:null,title:"Καθαρισμός υπογείου",desc:"Συσσώρευση σκόνης και σκουπιδιών.",status:"submitted",priority:"low",by:"Πέτρος Μακρής",date:"2026-03-02",assigned:null},
+  ],
+  documents: [
+    {id:"d1",bid:"b1",bname:"Λεωφ. Συγγρού 42",name:"Κανονισμός Πολυκατοικίας",cat:"contract",size:"245 KB",date:"2025-06-15"},
+    {id:"d2",bid:"b1",bname:"Λεωφ. Συγγρού 42",name:"Ασφαλιστήριο Συμβόλαιο 2026",cat:"insurance",size:"1.2 MB",date:"2026-01-10"},
+    {id:"d3",bid:"b1",bname:"Λεωφ. Συγγρού 42",name:"Πρακτικά ΓΣ — Σεπ 2025",cat:"minutes",size:"89 KB",date:"2025-09-20"},
+    {id:"d4",bid:"b1",bname:"Λεωφ. Συγγρού 42",name:"Σύμβαση Καθαρίστριας",cat:"contract",size:"156 KB",date:"2025-11-01"},
+    {id:"d5",bid:"b1",bname:"Λεωφ. Συγγρού 42",name:"Σύμβαση Ασανσέρ",cat:"contract",size:"312 KB",date:"2025-03-01"},
+    {id:"d6",bid:"b1",bname:"Λεωφ. Συγγρού 42",name:"Πιστοποιητικό Ανελκυστήρα",cat:"certificate",size:"78 KB",date:"2025-07-20"},
+    {id:"d7",bid:"b2",bname:"Ερμού 18",name:"Κανονισμός Πολυκατοικίας",cat:"contract",size:"198 KB",date:"2024-12-01"},
+    {id:"d8",bid:"b2",bname:"Ερμού 18",name:"Ασφαλιστήριο 2026",cat:"insurance",size:"980 KB",date:"2026-01-05"},
+    {id:"d9",bid:"b2",bname:"Ερμού 18",name:"Πρακτικά ΓΣ — Οκτ 2025",cat:"minutes",size:"102 KB",date:"2025-10-18"},
+  ],
+  monthlyData: [
+    {month:"Σεπ",income:2850,expenses:2640},{month:"Οκτ",income:2920,expenses:2780},
+    {month:"Νοε",income:3100,expenses:3350},{month:"Δεκ",income:3200,expenses:3050},
+    {month:"Ιαν",income:2950,expenses:2810},{month:"Φεβ",income:2780,expenses:2410},
+  ],
+};
+
+const MAINT_STATUS = {submitted:{l:"Υποβλήθηκε",c:"kyellow"},acknowledged:{l:"Αναγνωρίστηκε",c:"kaccent"},in_progress:{l:"Σε εξέλιξη",c:"korange"},resolved:{l:"Επιλύθηκε",c:"kgreen"},closed:{l:"Κλειστό",c:"kmut"},cancelled:{l:"Ακυρώθηκε",c:"kmut"}};
+const PRIORITY = {low:{l:"Χαμηλή",c:"kmut"},normal:{l:"Κανονική",c:"kaccent"},high:{l:"Υψηλή",c:"korange"},urgent:{l:"Επείγον",c:"kred"}};
+const DOC_CAT = {contract:{l:"Σύμβαση",c:"kaccent"},insurance:{l:"Ασφάλεια",c:"kgreen"},minutes:{l:"Πρακτικά",c:"kyellow"},certificate:{l:"Πιστοποιητικό",c:"kpurple"},other:{l:"Άλλο",c:"kmut"}};
+
+// ─── Helpers ─────────────────────────────────────────────────
+const fmt = n => new Intl.NumberFormat('el-GR',{style:'currency',currency:'EUR'}).format(n);
+const fmtDate = d => new Date(d).toLocaleDateString('el-GR',{day:'numeric',month:'short',year:'numeric'});
+const badge = (text,color) => `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold text-${color} bg-${color}/10">${text}</span>`;
+const chip = (text,active,onclick) => `<button class="chip px-3 py-1 rounded-full text-[12px] border ${active?'active border-kaccent bg-kaccent/10 text-kaccent font-semibold':'border-kborder text-ksec'}" onclick="${onclick}">${text}</button>`;
+
+function calcBills(b) {
+  const tMill = b.units.reduce((s,u) => s+u.mill, 0);
+  const tExp = b.expenses.reduce((s,e) => s+e.amount, 0);
+  return b.units.map((u,i) => {
+    const share = u.mill / tMill;
+    const total = Math.round(tExp * share * 100) / 100;
+    const statuses = ['paid','pending','overdue','paid','paid','paid','pending','paid','overdue','paid'];
+    return { unit: u.label, tenant: u.tenant, mill: u.mill, share: (share*100).toFixed(1), total, status: u.occupied ? statuses[i % statuses.length] : 'pending' };
+  });
+}
 
 // ─── Navigation ──────────────────────────────────────────────
 let currentPage = 'dashboard';
