@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ─── Custom font and color variables ─── */
 /* ─── Custom base styles ─── */
 * { box-sizing: border-box; }
 ::-webkit-scrollbar { width: 5px; }

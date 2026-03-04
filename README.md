@@ -2,7 +2,7 @@
 
 ## Project Structure
 ```
-koinoxrista/
+shared_expenses/
 ├── package.json          # Tailwind dependency + build scripts
 ├── tailwind.config.js    # Custom theme (colors, fonts)
 ├── vercel.json           # Vercel deployment config
@@ -22,7 +22,7 @@ koinoxrista/
 
 ### Option B: CLI
 ```bash
-cd koinoxrista
+cd shared_expenses
 npm install
 npm run build        # generates public/style.css
 npx vercel           # deploys to Vercel
