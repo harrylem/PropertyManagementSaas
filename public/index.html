@@ -11,21 +11,37 @@
 
 </head>
 
-<body class="bg-kbg text-ktext font-sans antialiased min-h-screen flex">
+<!-- Sidebar Toggle for Mobile -->
+<body class="bg-kbg text-ktext font-sans antialiased min-h-screen flex flex-col md:flex-row">
+<div class="md:hidden flex items-center justify-between bg-ksurface border-b border-kborder px-4 py-3 sticky top-0 z-30 w-full">
+  <div class="flex items-center gap-2.5">
+    <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-kaccent to-kpurple flex items-center justify-center">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    </div>
+    <div class="text-[15px] font-bold tracking-tight">App Name</div>
+  </div>
+  <button onclick="toggleSidebar()" class="text-ksec hover:text-ktext focus:outline-none">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </button>
+</div>
 
+<div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden transition-opacity" onclick="toggleSidebar()"></div>
 <!-- ═══════════════════════════════════════════════════════════ -->
 <!-- SIDEBAR                                                    -->
 <!-- ═══════════════════════════════════════════════════════════ -->
-<nav id="sidebar" class="w-[220px] bg-ksurface border-r border-kborder flex flex-col flex-shrink-0 sticky top-0 h-screen overflow-y-auto">
+<nav id="sidebar" class="w-[220px] bg-ksurface border-r border-kborder flex flex-col flex-shrink-0 h-screen overflow-y-auto fixed inset-y-0 left-0 z-50 transform -translate-x-full transition-transform duration-300 ease-in-out md:relative md:translate-x-0">
   <!-- Logo -->
   <div class="flex items-center gap-2.5 px-4 pt-5 pb-4">
     <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-kaccent to-kpurple flex items-center justify-center">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
     </div>
     <div>
-      <div class="text-[15px] font-bold tracking-tight">Koinoxrista</div>
+      <div class="text-[15px] font-bold tracking-tight">App Name</div>
       <div class="text-[9px] font-medium text-kmut uppercase tracking-widest">Property Manager</div>
     </div>
+    <button class="md:hidden text-kmut hover:text-ktext" onclick="toggleSidebar()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
   </div>
 
   <!-- Nav Groups -->
@@ -88,7 +104,7 @@
 <!-- ═══════════════════════════════════════════════════════════ -->
 <!-- MAIN CONTENT                                               -->
 <!-- ═══════════════════════════════════════════════════════════ -->
-<main class="flex-1 overflow-y-auto p-7 max-w-[1100px]">
+<main class="flex-1 overflow-y-auto p-4 md:p-7 w-full max-w-[1100px]">
   
 <!-- ─── DASHBOARD ──────────────────────────────────────────── -->
 <div id="page-dashboard" class="page active">
@@ -96,7 +112,7 @@
   <p class="text-[13px] text-ksec mb-6">Επισκόπηση διαχειριζόμενων ακινήτων — Μάρτιος 2026</p>
 
   <!-- Stats -->
-  <div class="grid grid-cols-4 gap-3 mb-7">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-7">
     <div class="bg-kcard border border-kborder rounded-xl p-4">
       <div class="text-[10.5px] text-kmut font-medium uppercase tracking-wider mb-1.5">Κτίρια</div>
       <div class="text-[24px] font-bold tracking-tight">2</div>
@@ -121,9 +137,9 @@
  
   <!-- Buildings table -->
   <div class="bg-kcard border border-kborder rounded-xl overflow-hidden mb-4">
-    <div class="flex justify-between items-center px-5 py-3.5 border-b border-kborder">
+    <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 px-5 py-3.5 border-b border-kborder">
       <span class="text-[14px] font-semibold">Τα Κτίριά μου</span>
-      <button class="flex items-center gap-1.5 bg-kaccent text-white px-3.5 py-1.5 rounded-lg text-[12.5px] font-semibold hover:opacity-90 transition">
+      <button class="flex w-full sm:w-auto justify-center items-center gap-1.5 bg-kaccent text-white px-3.5 py-1.5 rounded-lg text-[12.5px] font-semibold hover:opacity-90 transition">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         Νέο Κτίριο
       </button>
@@ -225,17 +241,17 @@
 <div id="page-tenants" class="page">
   <h1 class="text-[22px] font-bold tracking-tight mb-1">Ένοικοι & Ιδιοκτήτες</h1>
   <p class="text-[13px] text-ksec mb-6">Διαχείριση προσώπων σε όλα τα κτίρια</p>
-  <div class="flex justify-between items-center mb-4">
-    <div class="flex gap-1.5" id="tenant-filters"></div>
-    <div class="flex gap-2">
-      <div class="relative">
+  <div class="flex flex-col md:flex-row justify-between md:items-center gap-3 mb-4">
+    <div class="flex flex-wrap gap-1.5" id="tenant-filters"></div>
+    <div class="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+      <div class="relative w-full sm:w-auto">
         <svg class="absolute left-2.5 top-1/2 -translate-y-1/2 text-kmut" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-        <input id="tenant-search" type="text" placeholder="Αναζήτηση ενοίκων..." class="bg-kbg border border-kborder rounded-lg pl-8 pr-3 py-2 text-[13px] w-56 text-ktext" oninput="renderTenants()">
+        <input id="tenant-search" type="text" placeholder="Αναζήτηση ενοίκων..." class="w-full sm:w-56 bg-kbg border border-kborder rounded-lg pl-8 pr-3 py-2 text-[13px] text-ktext" oninput="renderTenants()">
       </div>
-      <button class="flex items-center gap-1.5 bg-kaccent text-white px-3.5 py-1.5 rounded-lg text-[12.5px] font-semibold hover:opacity-90 transition">
+      <button class="flex w-full sm:w-auto justify-center items-center gap-1.5 bg-kaccent text-white px-3.5 py-1.5 rounded-lg text-[12.5px] font-semibold hover:opacity-90 transition">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         Νέος Ένοικος
-      </button>
+       </button>
     </div>
   </div>
   <div class="bg-kcard border border-kborder rounded-xl overflow-hidden" id="tenants-table-wrap"></div>
@@ -252,9 +268,9 @@
 <div id="page-announcements" class="page">
   <h1 class="text-[22px] font-bold tracking-tight mb-1">Ανακοινώσεις</h1>
   <p class="text-[13px] text-ksec mb-6">Ενημερώσεις και ειδοποιήσεις προς τους ενοίκους</p>
-  <div class="flex justify-between items-center mb-5">
-    <div class="flex gap-1.5" id="announcement-filters"></div>
-    <button class="flex items-center gap-1.5 bg-kaccent text-white px-3.5 py-1.5 rounded-lg text-[12.5px] font-semibold hover:opacity-90 transition">
+  <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-5">
+    <div class="flex flex-wrap gap-1.5" id="announcement-filters"></div>
+    <button class="flex w-full sm:w-auto justify-center items-center gap-1.5 bg-kaccent text-white px-3.5 py-1.5 rounded-lg text-[12.5px] font-semibold hover:opacity-90 transition">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       Νέα Ανακοίνωση
     </button>
@@ -266,7 +282,7 @@
 <div id="page-maintenance" class="page">
   <h1 class="text-[22px] font-bold tracking-tight mb-1">Αιτήματα Συντήρησης</h1>
   <p class="text-[13px] text-ksec mb-6">Διαχείριση βλαβών και αιτημάτων επισκευής</p>
-  <div class="grid grid-cols-3 gap-3 mb-6">
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
     <div class="bg-kcard border border-kborder rounded-xl p-4">
       <div class="text-[10.5px] text-kmut font-medium uppercase tracking-wider mb-1.5">Συνολικά</div>
       <div class="text-[24px] font-bold tracking-tight">6</div>
@@ -280,9 +296,9 @@
       <div class="text-[24px] font-bold tracking-tight text-kgreen">1</div>
     </div>
   </div>
-  <div class="flex justify-between items-center mb-4">
+  <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-5">
     <div class="flex gap-1.5 flex-wrap" id="maint-filters"></div>
-    <button class="flex items-center gap-1.5 bg-kaccent text-white px-3.5 py-1.5 rounded-lg text-[12.5px] font-semibold hover:opacity-90 transition flex-shrink-0">
+    <button class="flex w-full sm:w-auto justify-center items-center gap-1.5 bg-kaccent text-white px-3.5 py-1.5 rounded-lg text-[12.5px] font-semibold hover:opacity-90 transition">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       Νέο Αίτημα
     </button>
@@ -294,9 +310,9 @@
 <div id="page-documents" class="page">
   <h1 class="text-[22px] font-bold tracking-tight mb-1">Έγγραφα</h1>
   <p class="text-[13px] text-ksec mb-6">Συμβάσεις, ασφαλιστήρια, πρακτικά και άλλα έγγραφα</p>
-  <div class="flex justify-between items-center mb-4">
+  <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-5">
     <div class="flex gap-1.5 flex-wrap" id="doc-filters"></div>
-    <button class="flex items-center gap-1.5 bg-kaccent text-white px-3.5 py-1.5 rounded-lg text-[12.5px] font-semibold hover:opacity-90 transition flex-shrink-0">
+    <button class="flex w-full sm:w-auto justify-center items-center gap-1.5 bg-kaccent text-white px-3.5 py-1.5 rounded-lg text-[12.5px] font-semibold hover:opacity-90 transition">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       Ανέβασμα
     </button>
@@ -333,7 +349,7 @@
   </div>
 
   <!-- Chart -->
-  <div class="bg-kcard border border-kborder rounded-xl overflow-hidden mb-4">
+  <div class="bg-kcard border border-kborder rounded-xl overflow-x-auto mb-4">
     <div class="px-5 py-3.5 border-b border-kborder flex justify-between items-center">
       <span class="text-[14px] font-semibold">Έσοδα vs Έξοδα — Τελευταίο 6μηνο</span>
       <div class="flex gap-4">
@@ -371,7 +387,7 @@
     <div class="bg-kcard border border-kborder rounded-xl overflow-hidden">
       <div class="px-5 py-3.5 border-b border-kborder"><span class="text-[14px] font-semibold">Στοιχεία Οργανισμού</span></div>
       <div class="p-5">
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div><label class="block text-[12px] font-medium text-ksec mb-1.5">Επωνυμία</label><input class="w-full bg-kbg border border-kborder rounded-lg px-3 py-2 text-[13px] text-ktext" value="Κώστας Μιχαηλίδης — Διαχείριση Ακινήτων"></div>
           <div><label class="block text-[12px] font-medium text-ksec mb-1.5">ΑΦΜ</label><input class="w-full bg-kbg border border-kborder rounded-lg px-3 py-2 text-[13px] text-ktext font-mono" value="123456789"></div>
           <div><label class="block text-[12px] font-medium text-ksec mb-1.5">ΔΟΥ</label><input class="w-full bg-kbg border border-kborder rounded-lg px-3 py-2 text-[13px] text-ktext" value="Νέας Σμύρνης"></div>
@@ -444,7 +460,7 @@
 
   <!-- Team tab -->
   <div id="stab-team" class="settings-panel hidden">
-    <div class="bg-kcard border border-kborder rounded-xl overflow-hidden">
+    <div class="bg-kcard border border-kborder rounded-xl overflow-x-auto">
       <div class="px-5 py-3.5 border-b border-kborder flex justify-between items-center">
         <span class="text-[14px] font-semibold">Μέλη Ομάδας</span>
         <button class="flex items-center gap-1.5 bg-kaccent text-white px-3.5 py-1.5 rounded-lg text-[12.5px] font-semibold hover:opacity-90 transition">
@@ -590,6 +606,30 @@ function navigateTo(page, param) {
 
   window.scrollTo(0, 0);
 }
+
+
+// ─── Sliding Logic ──────────────────────────────────────────────
+  function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    
+    // Toggle the slide effect
+    sidebar.classList.toggle('-translate-x-full');
+    
+    // Toggle the dark overlay
+    overlay.classList.toggle('hidden');
+  }
+
+  // Optional but recommended: 
+  // Update your existing navigateTo() function to also close the sidebar on mobile when a link is clicked!
+  function closeSidebarOnMobile() {
+    if (window.innerWidth < 768) { // 768px is Tailwind's 'md' breakpoint
+      const sidebar = document.getElementById('sidebar');
+      if (!sidebar.classList.contains('-translate-x-full')) {
+        toggleSidebar();
+      }
+    }
+  }
 
 // ─── Render: Buildings Grid ──────────────────────────────────
 function renderBuildings() {
