@@ -90,7 +90,122 @@
 <!-- ═══════════════════════════════════════════════════════════ -->
 <main class="flex-1 overflow-y-auto p-7 max-w-[1100px]">
   
+<!-- ─── DASHBOARD ──────────────────────────────────────────── -->
+<div id="page-dashboard" class="page active">
+  <h1 class="text-[22px] font-bold tracking-tight mb-1">Πίνακας Ελέγχου</h1>
+  <p class="text-[13px] text-ksec mb-6">Επισκόπηση διαχειριζόμενων ακινήτων — Μάρτιος 2026</p>
 
+  <!-- Stats -->
+  <div class="grid grid-cols-4 gap-3 mb-7">
+    <div class="bg-kcard border border-kborder rounded-xl p-4">
+      <div class="text-[10.5px] text-kmut font-medium uppercase tracking-wider mb-1.5">Κτίρια</div>
+      <div class="text-[24px] font-bold tracking-tight">2</div>
+      <div class="text-[12px] text-ksec mt-0.5">15 μονάδες</div>
+    </div>
+    <div class="bg-kcard border border-kborder rounded-xl p-4">
+      <div class="text-[10.5px] text-kmut font-medium uppercase tracking-wider mb-1.5">Ένοικοι</div>
+      <div class="text-[24px] font-bold tracking-tight text-kaccent">13</div>
+      <div class="text-[12px] text-ksec mt-0.5">13/15 κατοικημένα</div>
+    </div>
+    <div class="bg-kcard border border-kborder rounded-xl p-4">
+      <div class="text-[10.5px] text-kmut font-medium uppercase tracking-wider mb-1.5">Εκκρεμή</div>
+      <div class="text-[24px] font-bold tracking-tight text-kyellow">€683,40</div>
+      <div class="text-[12px] text-ksec mt-0.5">τρέχουσα περίοδος</div>
+    </div>
+    <div class="bg-kcard border border-kborder rounded-xl p-4">
+      <div class="text-[10.5px] text-kmut font-medium uppercase tracking-wider mb-1.5">Ληξιπρόθεσμα</div>
+      <div class="text-[24px] font-bold tracking-tight text-kred">€214,70</div>
+      <div class="text-[12px] text-ksec mt-0.5">3 λογαριασμοί</div>
+    </div>
+  </div>
+ 
+  <!-- Buildings table -->
+  <div class="bg-kcard border border-kborder rounded-xl overflow-hidden mb-4">
+    <div class="flex justify-between items-center px-5 py-3.5 border-b border-kborder">
+      <span class="text-[14px] font-semibold">Τα Κτίριά μου</span>
+      <button class="flex items-center gap-1.5 bg-kaccent text-white px-3.5 py-1.5 rounded-lg text-[12.5px] font-semibold hover:opacity-90 transition">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Νέο Κτίριο
+      </button>
+    </div>
+    <table class="w-full">
+      <thead>
+        <tr class="border-b border-kborder">
+          <th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Κτίριο</th>
+          <th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Μονάδες</th>
+          <th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Κατοικημένα</th>
+          <th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Εκκρεμή</th>
+          <th class="px-5 py-2.5 w-8"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="row-hover cursor-pointer border-b border-kborder" onclick="navigateTo('building-detail', 'b1')">
+          <td class="px-5 py-3">
+            <div class="flex items-center gap-2.5">
+              <div class="w-9 h-9 rounded-lg bg-kaccent/10 flex items-center justify-center text-kaccent">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22V12h6v10"/><path d="M8 6h.01M16 6h.01M12 6h.01M8 10h.01M16 10h.01M12 10h.01"/></svg>
+              </div>
+              <div>
+                <div class="text-[13px] font-medium">Λεωφ. Συγγρού 42</div>
+                <div class="text-[11px] text-kmut">Λεωφόρος Συγγρού 42, Αθήνα</div>
+              </div>
+            </div>
+          </td>
+          <td class="px-5 py-3 text-[13px] text-ksec">10</td>
+          <td class="px-5 py-3 text-[13px] text-ksec">9/10</td>
+          <td class="px-5 py-3 text-[13px] font-semibold font-mono text-kyellow">€487,20</td>
+          <td class="px-5 py-3 text-ksec"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></td>
+        </tr>
+        <tr class="row-hover cursor-pointer" onclick="navigateTo('building-detail', 'b2')">
+          <td class="px-5 py-3">
+            <div class="flex items-center gap-2.5">
+              <div class="w-9 h-9 rounded-lg bg-kaccent/10 flex items-center justify-center text-kaccent">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22V12h6v10"/><path d="M8 6h.01M16 6h.01M12 6h.01M8 10h.01M16 10h.01M12 10h.01"/></svg>
+              </div>
+              <div>
+                <div class="text-[13px] font-medium">Ερμού 18</div>
+                <div class="text-[11px] text-kmut">Ερμού 18, Νέα Σμύρνη</div>
+              </div>
+            </div>
+          </td>
+          <td class="px-5 py-3 text-[13px] text-ksec">5</td>
+          <td class="px-5 py-3 text-[13px] text-ksec">4/5</td>
+          <td class="px-5 py-3 text-[13px] font-semibold font-mono text-kyellow">€196,20</td>
+          <td class="px-5 py-3 text-ksec"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+    <!-- Recent Activity -->
+  <div class="bg-kcard border border-kborder rounded-xl overflow-hidden">
+    <div class="px-5 py-3.5 border-b border-kborder">
+      <span class="text-[14px] font-semibold">Πρόσφατη Δραστηριότητα</span>
+    </div>
+    <div class="divide-y divide-kborder">
+      <div class="flex items-center gap-3 px-5 py-2.5">
+        <div class="w-7 h-7 rounded-md bg-korange/10 flex items-center justify-center text-korange flex-shrink-0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div>
+        <div class="flex-1 text-[13px] text-ksec">Νέο αίτημα συντήρησης: <span class="text-ktext font-medium">Διαρροή νερού</span> (2Α, Συγγρού 42)</div>
+        <div class="text-[11px] text-kmut flex-shrink-0">2 ώρες πριν</div>
+      </div>
+      <div class="flex items-center gap-3 px-5 py-2.5">
+        <div class="w-7 h-7 rounded-md bg-kgreen/10 flex items-center justify-center text-kgreen flex-shrink-0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 10h12M4 14h12M6 6c1.5-2 3.5-3 6-3 4.42 0 8 3.58 8 8s-3.58 8-8 8c-2.5 0-4.5-1-6-3"/></svg></div>
+        <div class="flex-1 text-[13px] text-ksec">Πληρωμή <span class="text-kgreen font-medium font-mono">€95,40</span> από Σοφία Ιωάννου (5Α)</div>
+        <div class="text-[11px] text-kmut flex-shrink-0">5 ώρες πριν</div>
+      </div>
+      <div class="flex items-center gap-3 px-5 py-2.5">
+        <div class="w-7 h-7 rounded-md bg-kaccent/10 flex items-center justify-center text-kaccent flex-shrink-0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 11 18-5v12L3 13v-2z"/></svg></div>
+        <div class="flex-1 text-[13px] text-ksec">Νέα ανακοίνωση: <span class="text-ktext font-medium">Βλάβη κεντρικής πόρτας</span> (Ερμού 18)</div>
+        <div class="text-[11px] text-kmut flex-shrink-0">χθες</div>
+      </div>
+      <div class="flex items-center gap-3 px-5 py-2.5">
+        <div class="w-7 h-7 rounded-md bg-kgreen/10 flex items-center justify-center text-kgreen flex-shrink-0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="flex-1 text-[13px] text-ksec">Επιλύθηκε: <span class="text-ktext font-medium">Θόρυβος ασανσέρ</span> (Συγγρού 42)</div>
+        <div class="text-[11px] text-kmut flex-shrink-0">3 μέρες πριν</div>
+      </div>
+    </div>
+  </div>
+</div>
 <!-- ─── BUILDINGS LIST ─────────────────────────────────────── --> 
 <div id="page-buildings" class="page">
   <h1 class="text-[22px] font-bold tracking-tight mb-1">Κτίρια</h1>
