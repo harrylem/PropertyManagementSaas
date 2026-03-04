@@ -581,6 +581,23 @@ function renderMaintenance() {
   }).join('')}</tbody></table>`;
 }
 
+// ─── Render: Documents ───────────────────────────────────────
+function renderDocuments() {
+  const filtered = DATA.documents.filter(d => (state.buildingFilter === 'all' || d.bid === state.buildingFilter) && (state.docCat === 'all' || d.cat === state.docCat));
+  document.getElementById('doc-filters').innerHTML = [
+    chip('Όλα κτίρια', state.buildingFilter==='all', "state.buildingFilter='all';renderDocuments()"),
+    ...DATA.buildings.map(b => chip(b.name, state.buildingFilter===b.id, `state.buildingFilter='${b.id}';renderDocuments()`)),
+    '<div class="w-px bg-kborder mx-1"></div>',
+    chip('Όλα', state.docCat==='all', "state.docCat='all';renderDocuments()"),
+    ...Object.entries(DOC_CAT).map(([k,v]) => chip(v.l, state.docCat===k, `state.docCat='${k}';renderDocuments()`)),
+  ].join('');
+
+  document.getElementById('docs-table-wrap').innerHTML = `<table class="w-full"><thead><tr class="border-b border-kborder"><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Έγγραφο</th><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Κτίριο</th><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Κατηγορία</th><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Μέγεθος</th><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Ημ/νία</th><th class="px-5 py-2.5 w-10"></th></tr></thead><tbody>${filtered.map(d => {
+    const dc = DOC_CAT[d.cat] || DOC_CAT.other;
+    return `<tr class="border-b border-kborder last:border-0 row-hover"><td class="px-5 py-2.5"><div class="flex items-center gap-2.5"><div class="w-8 h-8 rounded-md bg-kred/10 flex items-center justify-center text-kred text-[10px] font-bold">PDF</div><span class="text-[13px] font-medium">${d.name}</span></div></td><td class="px-5 py-2.5 text-[13px] text-ksec">${d.bname}</td><td class="px-5 py-2.5">${badge(dc.l, dc.c)}</td><td class="px-5 py-2.5 text-[12px] text-ksec font-mono">${d.size}</td><td class="px-5 py-2.5 text-[12px] text-ksec">${fmtDate(d.date)}</td><td class="px-5 py-2.5"><button class="text-ksec hover:text-kaccent transition"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg></button></td></tr>`;
+  }).join('')}</tbody></table>`;
+}
+
 // ─── Settings tabs ───────────────────────────────────────────
 function switchSettingsTab(tab) {
   document.querySelectorAll('.settings-tab').forEach(t => { t.classList.remove('text-kaccent','font-semibold','border-kaccent'); t.classList.add('text-ksec','border-transparent'); });
