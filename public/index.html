@@ -562,6 +562,25 @@ function renderAnnouncements() {
   `).join('');
 }
 
+// ─── Render: Maintenance ─────────────────────────────────────
+function renderMaintenance() {
+  const filtered = DATA.maintenance.filter(m => (state.buildingFilter === 'all' || m.bid === state.buildingFilter) && (state.maintStatus === 'all' || m.status === state.maintStatus));
+  document.getElementById('maint-filters').innerHTML = [
+    chip('Όλα κτίρια', state.buildingFilter==='all', "state.buildingFilter='all';renderMaintenance()"),
+    ...DATA.buildings.map(b => chip(b.name, state.buildingFilter===b.id, `state.buildingFilter='${b.id}';renderMaintenance()`)),
+    '<div class="w-px bg-kborder mx-1"></div>',
+    chip('Όλες', state.maintStatus==='all', "state.maintStatus='all';renderMaintenance()"),
+    chip('Υποβλήθηκε', state.maintStatus==='submitted', "state.maintStatus='submitted';renderMaintenance()"),
+    chip('Σε εξέλιξη', state.maintStatus==='in_progress', "state.maintStatus='in_progress';renderMaintenance()"),
+    chip('Επιλυμένα', state.maintStatus==='resolved', "state.maintStatus='resolved';renderMaintenance()"),
+  ].join('');
+
+  document.getElementById('maint-table-wrap').innerHTML = `<table class="w-full"><thead><tr class="border-b border-kborder"><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Αίτημα</th><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Κτίριο</th><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Μονάδα</th><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Προτ.</th><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Κατάσταση</th><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Ανατέθηκε</th><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Ημ/νία</th></tr></thead><tbody>${filtered.map(m => {
+    const ms = MAINT_STATUS[m.status]; const pr = PRIORITY[m.priority];
+    return `<tr class="border-b border-kborder last:border-0 row-hover"><td class="px-5 py-2.5"><div class="text-[13px] font-medium">${m.title}</div><div class="text-[11px] text-kmut mt-0.5">${m.desc.slice(0,55)}...</div></td><td class="px-5 py-2.5 text-[13px] text-ksec">${m.bname}</td><td class="px-5 py-2.5 text-[13px] text-ksec">${m.unit||'<span class="text-kmut">Κοινόχρ.</span>'}</td><td class="px-5 py-2.5"><span class="text-[12px] font-semibold text-${pr.c}">${pr.l}</span></td><td class="px-5 py-2.5">${badge(ms.l, ms.c)}</td><td class="px-5 py-2.5 text-[13px] text-ksec">${m.assigned||'<span class="text-kmut">—</span>'}</td><td class="px-5 py-2.5 text-[12px] text-ksec">${fmtDate(m.date)}</td></tr>`;
+  }).join('')}</tbody></table>`;
+}
+
 // ─── Settings tabs ───────────────────────────────────────────
 function switchSettingsTab(tab) {
   document.querySelectorAll('.settings-tab').forEach(t => { t.classList.remove('text-kaccent','font-semibold','border-kaccent'); t.classList.add('text-ksec','border-transparent'); });
