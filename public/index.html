@@ -504,6 +504,23 @@ function switchBdTab(tab, bid) {
   }
 }
 
+// ─── Render: Tenants ─────────────────────────────────────────
+function renderTenants() {
+  const search = document.getElementById('tenant-search')?.value?.toLowerCase() || '';
+  const all = DATA.buildings.flatMap(b => b.units.filter(u => u.tenant).map(u => ({...u.tenant, building: b.name, unit: u.label})));
+  const filtered = all.filter(t => (state.tenantRole === 'all' || t.role === state.tenantRole) && (search === '' || t.name.toLowerCase().includes(search) || t.email.toLowerCase().includes(search)));
+
+  document.getElementById('tenant-filters').innerHTML = [
+    chip('Όλοι', state.tenantRole==='all', "state.tenantRole='all';renderTenants()"),
+    chip('Ενοικιαστές', state.tenantRole==='renter', "state.tenantRole='renter';renderTenants()"),
+    chip('Ιδιοκτήτες', state.tenantRole==='owner', "state.tenantRole='owner';renderTenants()"),
+  ].join('');
+
+  document.getElementById('tenants-table-wrap').innerHTML = `<table class="w-full"><thead><tr class="border-b border-kborder"><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Όνομα</th><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Κτίριο</th><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Μονάδα</th><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Ρόλος</th><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Email</th><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Τηλέφωνο</th></tr></thead><tbody>${filtered.map(t =>
+    `<tr class="border-b border-kborder last:border-0 row-hover"><td class="px-5 py-2.5"><div class="flex items-center gap-2.5"><div class="w-7 h-7 rounded-full bg-gradient-to-br from-kaccent to-kaccentd flex items-center justify-center text-white text-[10px] font-bold">${t.name[0]}</div><span class="text-[13px] font-medium">${t.name}</span></div></td><td class="px-5 py-2.5 text-[13px] text-ksec">${t.building}</td><td class="px-5 py-2.5 text-[13px] text-ksec">${t.unit}</td><td class="px-5 py-2.5">${badge(t.role==='owner'?'Ιδιοκτήτης':'Ενοικιαστής', t.role==='owner'?'kaccent':'kgreen')}</td><td class="px-5 py-2.5 text-[12px] text-ksec">${t.email}</td><td class="px-5 py-2.5 text-[12px] text-ksec font-mono">${t.phone}</td></tr>`
+  ).join('')}</tbody></table>`;
+}
+
 // ─── Settings tabs ───────────────────────────────────────────
 function switchSettingsTab(tab) {
   document.querySelectorAll('.settings-tab').forEach(t => { t.classList.remove('text-kaccent','font-semibold','border-kaccent'); t.classList.add('text-ksec','border-transparent'); });
