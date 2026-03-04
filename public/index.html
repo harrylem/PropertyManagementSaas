@@ -535,6 +535,33 @@ function renderBilling() {
   }).join('');
 }
 
+// ─── Render: Announcements ───────────────────────────────────
+function renderAnnouncements() {
+  const filtered = DATA.announcements.filter(a => state.buildingFilter === 'all' || a.bid === state.buildingFilter);
+  document.getElementById('announcement-filters').innerHTML = [
+    chip('Όλα', state.buildingFilter==='all', "state.buildingFilter='all';renderAnnouncements()"),
+    ...DATA.buildings.map(b => chip(b.name, state.buildingFilter===b.id, `state.buildingFilter='${b.id}';renderAnnouncements()`))
+  ].join('');
+
+  const priColor = {urgent:'border-l-kred',high:'border-l-korange',normal:'border-l-kaccent',low:'border-l-kmut'};
+  document.getElementById('announcements-list').innerHTML = filtered.map(a => `
+    <div class="bg-kcard border border-kborder rounded-xl overflow-hidden border-l-[3px] ${priColor[a.priority]}">
+      <div class="p-5">
+        <div class="flex justify-between items-start mb-2">
+          <div class="flex items-center gap-2 flex-wrap">
+            ${a.pinned ? '<span class="text-[11px] font-semibold text-kaccent flex items-center gap-1"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><line x1="12" x2="12" y1="17" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg>Καρφ.</span>' : ''}
+            ${badge(PRIORITY[a.priority].l, PRIORITY[a.priority].c)}
+            <span class="px-2 py-0.5 rounded-md text-[11px] font-medium bg-kbg text-ksec">${a.bname}</span>
+          </div>
+          <span class="text-[11px] text-kmut flex-shrink-0">${fmtDate(a.date)}</span>
+        </div>
+        <div class="text-[15px] font-semibold mb-1.5">${a.title}</div>
+        <div class="text-[13px] text-ksec leading-relaxed">${a.body}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
 // ─── Settings tabs ───────────────────────────────────────────
 function switchSettingsTab(tab) {
   document.querySelectorAll('.settings-tab').forEach(t => { t.classList.remove('text-kaccent','font-semibold','border-kaccent'); t.classList.add('text-ksec','border-transparent'); });
