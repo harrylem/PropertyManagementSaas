@@ -353,6 +353,117 @@
   </div>
 </div>
 
+<!-- ─── SETTINGS ───────────────────────────────────────────── -->
+<div id="page-settings" class="page">
+  <h1 class="text-[22px] font-bold tracking-tight mb-1">Ρυθμίσεις</h1>
+  <p class="text-[13px] text-ksec mb-6">Διαχείριση λογαριασμού και προτιμήσεων</p>
+
+  <!-- Tabs -->
+  <div class="flex gap-1 border-b border-kborder mb-5" id="settings-tabs">
+    <button onclick="switchSettingsTab('org')" class="settings-tab px-4 py-2.5 text-[13px] font-semibold text-kaccent border-b-2 border-kaccent" data-tab="org">Οργανισμός</button>
+    <button onclick="switchSettingsTab('billing-s')" class="settings-tab px-4 py-2.5 text-[13px] text-ksec border-b-2 border-transparent" data-tab="billing-s">Χρεώσεις</button>
+    <button onclick="switchSettingsTab('notifs')" class="settings-tab px-4 py-2.5 text-[13px] text-ksec border-b-2 border-transparent" data-tab="notifs">Ειδοποιήσεις</button>
+    <button onclick="switchSettingsTab('team')" class="settings-tab px-4 py-2.5 text-[13px] text-ksec border-b-2 border-transparent" data-tab="team">Ομάδα</button>
+  </div>
+
+  <!-- Org tab -->
+  <div id="stab-org" class="settings-panel">
+    <div class="bg-kcard border border-kborder rounded-xl overflow-hidden">
+      <div class="px-5 py-3.5 border-b border-kborder"><span class="text-[14px] font-semibold">Στοιχεία Οργανισμού</span></div>
+      <div class="p-5">
+        <div class="grid grid-cols-2 gap-4">
+          <div><label class="block text-[12px] font-medium text-ksec mb-1.5">Επωνυμία</label><input class="w-full bg-kbg border border-kborder rounded-lg px-3 py-2 text-[13px] text-ktext" value="Κώστας Μιχαηλίδης — Διαχείριση Ακινήτων"></div>
+          <div><label class="block text-[12px] font-medium text-ksec mb-1.5">ΑΦΜ</label><input class="w-full bg-kbg border border-kborder rounded-lg px-3 py-2 text-[13px] text-ktext font-mono" value="123456789"></div>
+          <div><label class="block text-[12px] font-medium text-ksec mb-1.5">ΔΟΥ</label><input class="w-full bg-kbg border border-kborder rounded-lg px-3 py-2 text-[13px] text-ktext" value="Νέας Σμύρνης"></div>
+          <div><label class="block text-[12px] font-medium text-ksec mb-1.5">Email</label><input class="w-full bg-kbg border border-kborder rounded-lg px-3 py-2 text-[13px] text-ktext" value="info@koinoxrista-km.gr"></div>
+          <div><label class="block text-[12px] font-medium text-ksec mb-1.5">Τηλέφωνο</label><input class="w-full bg-kbg border border-kborder rounded-lg px-3 py-2 text-[13px] text-ktext font-mono" value="210 1234567"></div>
+          <div><label class="block text-[12px] font-medium text-ksec mb-1.5">Γλώσσα</label><select class="w-full bg-kbg border border-kborder rounded-lg px-3 py-2 text-[13px] text-ktext"><option>Ελληνικά</option><option>English</option></select></div>
+          <div class="col-span-2"><label class="block text-[12px] font-medium text-ksec mb-1.5">Διεύθυνση</label><input class="w-full bg-kbg border border-kborder rounded-lg px-3 py-2 text-[13px] text-ktext" value="Λεωφ. Ελ. Βενιζέλου 74, Νέα Σμύρνη 171 21"></div>
+        </div>
+        <div class="flex justify-end mt-5"><button class="bg-kaccent text-white px-4 py-2 rounded-lg text-[13px] font-semibold hover:opacity-90 transition">Αποθήκευση</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Billing settings tab -->
+  <div id="stab-billing-s" class="settings-panel hidden">
+    <div class="bg-kcard border border-kborder rounded-xl overflow-hidden">
+      <div class="px-5 py-3.5 border-b border-kborder"><span class="text-[14px] font-semibold">Ρυθμίσεις Χρεώσεων</span></div>
+      <div class="p-5">
+        <div class="grid grid-cols-2 gap-4 mb-5">
+          <div><label class="block text-[12px] font-medium text-ksec mb-1.5">Προεπιλεγμένη ημ/νία λήξης (μέρες)</label><input type="number" class="w-full bg-kbg border border-kborder rounded-lg px-3 py-2 text-[13px] text-ktext font-mono" value="15"></div>
+          <div><label class="block text-[12px] font-medium text-ksec mb-1.5">Νόμισμα</label><input class="w-full bg-kbg border border-kborder rounded-lg px-3 py-2 text-[13px] text-kmut" value="EUR" disabled></div>
+        </div>
+        <div class="border-t border-kborder pt-5 space-y-5">
+          <div class="flex justify-between items-center">
+            <div><div class="text-[13px] font-medium">Αυτόματη υπενθύμιση πληρωμής</div><div class="text-[12px] text-kmut mt-0.5">Αποστολή email 3 μέρες πριν τη λήξη</div></div>
+            <button class="toggle-track w-10 h-[22px] rounded-full bg-kaccent relative" onclick="this.classList.toggle('bg-kaccent');this.classList.toggle('bg-kborder');this.querySelector('div').classList.toggle('left-[21px]');this.querySelector('div').classList.toggle('left-[3px]')"><div class="toggle-dot w-4 h-4 rounded-full bg-white absolute top-[3px] left-[21px]"></div></button>
+          </div>
+          <div class="flex justify-between items-center">
+            <div><div class="text-[13px] font-medium">Αυτόματη προσαύξηση εκπρόθεσμων</div><div class="text-[12px] text-kmut mt-0.5">Προσθήκη 2% μετά από 30 μέρες καθυστέρηση</div></div>
+            <button class="toggle-track w-10 h-[22px] rounded-full bg-kborder relative" onclick="this.classList.toggle('bg-kaccent');this.classList.toggle('bg-kborder');this.querySelector('div').classList.toggle('left-[21px]');this.querySelector('div').classList.toggle('left-[3px]')"><div class="toggle-dot w-4 h-4 rounded-full bg-white absolute top-[3px] left-[3px]"></div></button>
+          </div>
+        </div>
+        <div class="border-t border-kborder pt-5 mt-5">
+          <div class="text-[10.5px] text-kmut font-medium uppercase tracking-wider mb-3">Μέθοδοι Πληρωμής</div>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="bg-kbg border border-kborder rounded-lg p-3 flex justify-between items-center"><span class="text-[13px] font-medium">Κάρτα (Stripe)</span><span class="text-[11px] font-semibold text-kgreen bg-kgreen/10 px-2 py-0.5 rounded-full">Ενεργό</span></div>
+            <div class="bg-kbg border border-kborder rounded-lg p-3 flex justify-between items-center"><span class="text-[13px] font-medium">IRIS</span><span class="text-[11px] font-semibold text-kyellow bg-kyellow/10 px-2 py-0.5 rounded-full">Ρύθμιση</span></div>
+            <div class="bg-kbg border border-kborder rounded-lg p-3 flex justify-between items-center"><span class="text-[13px] font-medium">Τραπεζικό Έμβασμα</span><span class="text-[11px] font-semibold text-kgreen bg-kgreen/10 px-2 py-0.5 rounded-full">Ενεργό</span></div>
+            <div class="bg-kbg border border-kborder rounded-lg p-3 flex justify-between items-center"><span class="text-[13px] font-medium">Μετρητά</span><span class="text-[11px] font-semibold text-kgreen bg-kgreen/10 px-2 py-0.5 rounded-full">Ενεργό</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notifications tab -->
+  <div id="stab-notifs" class="settings-panel hidden">
+    <div class="bg-kcard border border-kborder rounded-xl overflow-hidden">
+      <div class="px-5 py-3.5 border-b border-kborder"><span class="text-[14px] font-semibold">Ειδοποιήσεις</span></div>
+      <div class="p-5 divide-y divide-kborder">
+        <div class="flex justify-between items-center py-3.5 first:pt-0">
+          <div><div class="text-[13px] font-medium">Ειδοποιήσεις email</div><div class="text-[12px] text-kmut mt-0.5">Λήψη email για νέα αιτήματα και πληρωμές</div></div>
+          <button class="toggle-track w-10 h-[22px] rounded-full bg-kaccent relative" onclick="this.classList.toggle('bg-kaccent');this.classList.toggle('bg-kborder');this.querySelector('div').classList.toggle('left-[21px]');this.querySelector('div').classList.toggle('left-[3px]')"><div class="toggle-dot w-4 h-4 rounded-full bg-white absolute top-[3px] left-[21px]"></div></button>
+        </div>
+        <div class="flex justify-between items-center py-3.5">
+          <div><div class="text-[13px] font-medium">Υπενθύμιση λογαριασμών</div><div class="text-[12px] text-kmut mt-0.5">Αυτόματη αποστολή στους ενοίκους</div></div>
+          <button class="toggle-track w-10 h-[22px] rounded-full bg-kaccent relative" onclick="this.classList.toggle('bg-kaccent');this.classList.toggle('bg-kborder');this.querySelector('div').classList.toggle('left-[21px]');this.querySelector('div').classList.toggle('left-[3px]')"><div class="toggle-dot w-4 h-4 rounded-full bg-white absolute top-[3px] left-[21px]"></div></button>
+        </div>
+        <div class="flex justify-between items-center py-3.5">
+          <div><div class="text-[13px] font-medium">Νέο αίτημα συντήρησης</div><div class="text-[12px] text-kmut mt-0.5">Ειδοποίηση κατά την υποβολή αιτήματος</div></div>
+          <button class="toggle-track w-10 h-[22px] rounded-full bg-kaccent relative" onclick="this.classList.toggle('bg-kaccent');this.classList.toggle('bg-kborder');this.querySelector('div').classList.toggle('left-[21px]');this.querySelector('div').classList.toggle('left-[3px]')"><div class="toggle-dot w-4 h-4 rounded-full bg-white absolute top-[3px] left-[21px]"></div></button>
+        </div>
+        <div class="flex justify-between items-center py-3.5 last:pb-0">
+          <div><div class="text-[13px] font-medium">Επιβεβαίωση πληρωμής</div><div class="text-[12px] text-kmut mt-0.5">Email επιβεβαίωσης στον ένοικο μετά την πληρωμή</div></div>
+          <button class="toggle-track w-10 h-[22px] rounded-full bg-kaccent relative" onclick="this.classList.toggle('bg-kaccent');this.classList.toggle('bg-kborder');this.querySelector('div').classList.toggle('left-[21px]');this.querySelector('div').classList.toggle('left-[3px]')"><div class="toggle-dot w-4 h-4 rounded-full bg-white absolute top-[3px] left-[21px]"></div></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Team tab -->
+  <div id="stab-team" class="settings-panel hidden">
+    <div class="bg-kcard border border-kborder rounded-xl overflow-hidden">
+      <div class="px-5 py-3.5 border-b border-kborder flex justify-between items-center">
+        <span class="text-[14px] font-semibold">Μέλη Ομάδας</span>
+        <button class="flex items-center gap-1.5 bg-kaccent text-white px-3.5 py-1.5 rounded-lg text-[12.5px] font-semibold hover:opacity-90 transition">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Πρόσκληση
+        </button>
+      </div>
+      <table class="w-full">
+        <thead><tr class="border-b border-kborder"><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Μέλος</th><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Email</th><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Ρόλος</th><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Κατάσταση</th></tr></thead>
+        <tbody>
+          <tr class="border-b border-kborder"><td class="px-5 py-3"><div class="flex items-center gap-2.5"><div class="w-8 h-8 rounded-full bg-gradient-to-br from-kgreen to-emerald-700 flex items-center justify-center text-white text-[11px] font-bold">ΚΜ</div><span class="text-[13px] font-medium">Κώστας Μιχαηλίδης</span></div></td><td class="px-5 py-3 text-[13px] text-ksec"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="d6bdb9a5a2b7a596bdb9bfb8b9aea4bfa5a2b7fbbdbbf8b1a4">[email&#160;protected]</a></td><td class="px-5 py-3"><span class="text-[11px] font-semibold text-kaccent bg-kaccent/10 px-2 py-0.5 rounded-full">Ιδιοκτήτης</span></td><td class="px-5 py-3"><span class="text-[11px] font-semibold text-kgreen bg-kgreen/10 px-2 py-0.5 rounded-full">Ενεργός</span></td></tr>
+          <tr class="border-b border-kborder"><td class="px-5 py-3"><div class="flex items-center gap-2.5"><div class="w-8 h-8 rounded-full bg-gradient-to-br from-kaccent to-kaccentd flex items-center justify-center text-white text-[11px] font-bold">ΕΠ</div><span class="text-[13px] font-medium">Ελένη Παπανδρέου</span></div></td><td class="px-5 py-3 text-[13px] text-ksec"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="d4b1b8b1babd94bfbbbdbabbaca6bda7a0b5f9bfb9fab3a6">[email&#160;protected]</a></td><td class="px-5 py-3"><span class="text-[11px] font-semibold text-korange bg-korange/10 px-2 py-0.5 rounded-full">Διαχειριστής</span></td><td class="px-5 py-3"><span class="text-[11px] font-semibold text-kgreen bg-kgreen/10 px-2 py-0.5 rounded-full">Ενεργός</span></td></tr>
+          <tr><td class="px-5 py-3"><div class="flex items-center gap-2.5"><div class="w-8 h-8 rounded-full bg-kbg border border-dashed border-kborder flex items-center justify-center text-kmut text-[11px] font-bold">?</div><span class="text-[13px] font-medium text-ksec"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="c8a9ababa7bda6bca1a6af88bca9b0a7aeaea1abade6afba">[email&#160;protected]</a></span></div></td><td class="px-5 py-3 text-[13px] text-ksec"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="08696b6b677d667c61666f487c6970676e6e616b6d266f7a">[email&#160;protected]</a></td><td class="px-5 py-3"><span class="text-[11px] font-semibold text-ksec bg-kbg px-2 py-0.5 rounded-full">Αναγνώστης</span></td><td class="px-5 py-3"><span class="text-[11px] font-semibold text-kyellow bg-kyellow/10 px-2 py-0.5 rounded-full">Σε αναμονή</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
 </main>
 
 <!-- ═══════════════════════════════════════════════════════════ -->
