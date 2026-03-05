@@ -1,836 +1,513 @@
 <!DOCTYPE html>
-<html lang="el" class="dark">
+<html lang="el">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Shared Expenses — Property Management</title>
-  <meta name="description" content="Σύγχρονη πλατφόρμα διαχείρισης κοινοχρήστων και ακινήτων" />
+  <title>Shared Expenses — Διαχείριση Κοινοχρήστων</title>
+  <meta name="description" content="Η σύγχρονη πλατφόρμα που αυτοματοποιεί τα κοινόχρηστα, τις πληρωμές και τη συντήρηση των κτιρίων σας." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #08090d; --bg2: #0e1017; --surface: #141620; --card: #181b28;
+      --border: #222640; --border-l: #2e3350;
+      --text: #e6e7ed; --sec: #8a8ea6; --mut: #4e536e;
+      --accent: #4a8df8; --accent-d: #3568c0; --accent-g: linear-gradient(135deg, #4a8df8 0%, #7b5cf5 100%);
+      --green: #1faa64; --yellow: #dba010; --red: #d93548; --orange: #d96a20; --purple: #7b5cf5;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; -webkit-tap-highlight-color: transparent; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; }
+    .font-display { font-family: 'Outfit', sans-serif; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
 
+    /* ── Grain overlay ── */
+    body::before {
+      content: ''; position: fixed; inset: 0; z-index: 9999; pointer-events: none; opacity: 0.025;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    /* ── Glow effects ── */
+    .glow-top { position: absolute; top: -200px; left: 50%; transform: translateX(-50%); width: 800px; height: 500px; background: radial-gradient(ellipse, rgba(74,141,248,0.08) 0%, transparent 70%); pointer-events: none; }
+    .glow-purple { position: absolute; top: 200px; right: -100px; width: 400px; height: 400px; background: radial-gradient(circle, rgba(123,92,245,0.06) 0%, transparent 70%); pointer-events: none; }
+
+    /* ── Animations ── */
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+    @keyframes pulse-ring { 0% { transform: scale(0.95); opacity: 0.5; } 100% { transform: scale(1.3); opacity: 0; } }
+    @keyframes slide-counter { 0% { transform: translateY(100%); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+
+    .anim-fade-up { opacity: 0; animation: fadeUp 0.7s ease-out forwards; }
+    .anim-delay-1 { animation-delay: 0.1s; }
+    .anim-delay-2 { animation-delay: 0.2s; }
+    .anim-delay-3 { animation-delay: 0.3s; }
+    .anim-delay-4 { animation-delay: 0.4s; }
+    .anim-delay-5 { animation-delay: 0.5s; }
+    .anim-delay-6 { animation-delay: 0.6s; }
+    .anim-delay-7 { animation-delay: 0.7s; }
+
+    /* ── Scroll reveal ── */
+    .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ── Button styles ── */
+    .btn-primary { display: inline-flex; align-items: center; gap: 8px; padding: 12px 28px; background: var(--accent-g); color: white; font-weight: 600; font-size: 14px; border-radius: 10px; border: none; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; text-decoration: none; }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(74,141,248,0.25); }
+    .btn-secondary { display: inline-flex; align-items: center; gap: 8px; padding: 12px 28px; background: transparent; color: var(--sec); font-weight: 600; font-size: 14px; border-radius: 10px; border: 1px solid var(--border); cursor: pointer; transition: all 0.2s; text-decoration: none; }
+    .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-sm { padding: 8px 18px; font-size: 13px; border-radius: 8px; }
+
+    /* ── Card styles ── */
+    .feature-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 32px; transition: border-color 0.3s, transform 0.3s; }
+    .feature-card:hover { border-color: var(--accent); transform: translateY(-4px); }
+    .pricing-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 36px; position: relative; transition: border-color 0.3s, transform 0.3s; }
+    .pricing-card:hover { transform: translateY(-4px); }
+    .pricing-card.featured { border-color: var(--accent); }
+    .pricing-card.featured::before { content: ''; position: absolute; inset: -1px; border-radius: 20px; background: var(--accent-g); z-index: -1; opacity: 0.15; }
+
+    /* ── Misc ── */
+    .gradient-text { background: var(--accent-g); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .divider { height: 1px; background: var(--border); }
+    .badge { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 50px; font-size: 12px; font-weight: 600; }
+    .stat-counter { display: inline-block; animation: slide-counter 0.6s ease-out forwards; }
+    .mockup-shadow { filter: drop-shadow(0 25px 60px rgba(0,0,0,0.5)) drop-shadow(0 8px 20px rgba(74,141,248,0.08)); }
+    .check-item { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; color: var(--sec); line-height: 1.5; }
+    .check-item svg { flex-shrink: 0; margin-top: 2px; color: var(--green); }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .hero-grid { flex-direction: column !important; text-align: center; }
+      .hero-buttons { justify-content: center !important; }
+      .features-grid, .pricing-grid { grid-template-columns: 1fr !important; }
+      .steps-grid { grid-template-columns: 1fr !important; }
+      .footer-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
+      .stats-bar { flex-wrap: wrap; }
+      .nav-links { display: none !important; }
+      .mobile-menu-btn { display: flex !important; }
+    }
+    @media (max-width: 480px) {
+      .hero-headline { font-size: 32px !important; line-height: 1.15 !important; }
+    }
+  </style>
 </head>
 
-<!-- Sidebar Toggle for Mobile -->
-<body class="bg-kbg text-ktext font-sans antialiased min-h-screen flex flex-col md:flex-row">
-<div class="md:hidden flex items-center justify-between bg-ksurface border-b border-kborder px-4 py-3 sticky top-0 z-30 w-full">
-  <div class="flex items-center gap-2.5">
-    <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-kaccent to-kpurple flex items-center justify-center">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-    </div>
-    <div class="text-[15px] font-bold tracking-tight">App Name</div>
-  </div>
-  <button onclick="toggleSidebar()" class="text-ksec hover:text-ktext focus:outline-none">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-  </button>
-</div>
+<body>
 
-<div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden transition-opacity" onclick="toggleSidebar()"></div>
 <!-- ═══════════════════════════════════════════════════════════ -->
-<!-- SIDEBAR                                                    -->
+<!-- NAVBAR                                                     -->
 <!-- ═══════════════════════════════════════════════════════════ -->
-<nav id="sidebar" class="w-[220px] bg-ksurface border-r border-kborder flex flex-col flex-shrink-0 h-screen overflow-y-auto fixed inset-y-0 left-0 z-50 transform -translate-x-full transition-transform duration-300 ease-in-out md:relative md:translate-x-0">
-  <!-- Logo -->
-  <div class="flex items-center gap-2.5 px-4 pt-5 pb-4">
-    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-kaccent to-kpurple flex items-center justify-center">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-    </div>
-    <div>
-      <div class="text-[15px] font-bold tracking-tight">App Name</div>
-      <div class="text-[9px] font-medium text-kmut uppercase tracking-widest">Property Manager</div>
-    </div>
-    <button class="md:hidden text-kmut hover:text-ktext" onclick="toggleSidebar()">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-    </button>
-  </div>
-
-  <!-- Nav Groups -->
-  <div class="flex-1 px-2">
-    <div class="text-[10px] font-semibold text-kmut uppercase tracking-widest px-2 pt-4 pb-1">Κύρια</div>
-    <button onclick="navigateTo('dashboard')" class="nav-item active flex items-center gap-2.5 w-full text-left px-2.5 py-2 rounded-md text-[13px] text-ksec" data-nav="dashboard">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-      Πίνακας Ελέγχου
-    </button>
-    <button onclick="navigateTo('buildings')" class="nav-item flex items-center gap-2.5 w-full text-left px-2.5 py-2 rounded-md text-[13px] text-ksec" data-nav="buildings">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22V12h6v10"/><path d="M8 6h.01M16 6h.01M12 6h.01M8 10h.01M16 10h.01M12 10h.01"/></svg>
-      Κτίρια
-    </button>
-    <button onclick="navigateTo('tenants')" class="nav-item flex items-center gap-2.5 w-full text-left px-2.5 py-2 rounded-md text-[13px] text-ksec" data-nav="tenants">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-      Ένοικοι
-    </button>
-    <button onclick="navigateTo('billing')" class="nav-item flex items-center gap-2.5 w-full text-left px-2.5 py-2 rounded-md text-[13px] text-ksec" data-nav="billing">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10h12M4 14h12M6 6c1.5-2 3.5-3 6-3 4.42 0 8 3.58 8 8s-3.58 8-8 8c-2.5 0-4.5-1-6-3"/></svg>
-      Κοινόχρηστα
-    </button>
-
-    <div class="text-[10px] font-semibold text-kmut uppercase tracking-widest px-2 pt-5 pb-1">Διαχείριση</div>
-    <button onclick="navigateTo('announcements')" class="nav-item flex items-center gap-2.5 w-full text-left px-2.5 py-2 rounded-md text-[13px] text-ksec" data-nav="announcements">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 18-5v12L3 13v-2z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>
-      Ανακοινώσεις
-    </button>
-    <button onclick="navigateTo('maintenance')" class="nav-item flex items-center gap-2.5 w-full text-left px-2.5 py-2 rounded-md text-[13px] text-ksec" data-nav="maintenance">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
-      Συντήρηση
-    </button>
-    <button onclick="navigateTo('documents')" class="nav-item flex items-center gap-2.5 w-full text-left px-2.5 py-2 rounded-md text-[13px] text-ksec" data-nav="documents">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/></svg>
-      Έγγραφα
-    </button>
-
-    <div class="text-[10px] font-semibold text-kmut uppercase tracking-widest px-2 pt-5 pb-1">Ανάλυση</div>
-    <button onclick="navigateTo('reports')" class="nav-item flex items-center gap-2.5 w-full text-left px-2.5 py-2 rounded-md text-[13px] text-ksec" data-nav="reports">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="20" y2="10"/><line x1="18" x2="18" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="16"/></svg>
-      Αναφορές
-    </button>
-    <button onclick="navigateTo('settings')" class="nav-item flex items-center gap-2.5 w-full text-left px-2.5 py-2 rounded-md text-[13px] text-ksec" data-nav="settings">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.604.852.997 1.51 1H21a2 2 0 0 1 0 4h-.09c-.658.003-1.25.396-1.51 1z"/></svg>
-      Ρυθμίσεις
-    </button>
-  </div>
-
-  <!-- User -->
-  <div class="px-4 py-3.5 border-t border-kborder">
-    <div class="flex items-center gap-2.5">
-      <div class="w-[30px] h-[30px] rounded-full bg-gradient-to-br from-kgreen to-emerald-700 flex items-center justify-center text-white text-[11px] font-bold">ΚΜ</div>
-      <div>
-        <div class="text-[12.5px] font-medium">Κώστας Μ.</div>
-        <div class="text-[10.5px] text-kmut">Διαχειριστής</div>
+<nav style="position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(8,9,13,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);">
+  <div style="max-width:1200px;margin:0 auto;padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between;">
+    <a href="#" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text);">
+      <div style="width:32px;height:32px;border-radius:9px;background:var(--accent-g);display:flex;align-items:center;justify-content:center;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
       </div>
+      <span class="font-display" style="font-size:17px;font-weight:700;letter-spacing:-0.3px;">App Name</span>
+    </a>
+    <div class="nav-links" style="display:flex;align-items:center;gap:32px;">
+      <a href="#features" style="font-size:13px;color:var(--sec);text-decoration:none;font-weight:500;transition:color 0.2s;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--sec)'">Χαρακτηριστικά</a>
+      <a href="#pricing" style="font-size:13px;color:var(--sec);text-decoration:none;font-weight:500;transition:color 0.2s;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--sec)'">Τιμές</a>
+      <a href="#how" style="font-size:13px;color:var(--sec);text-decoration:none;font-weight:500;transition:color 0.2s;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--sec)'">Πώς Λειτουργεί</a>
     </div>
+    <div className="flex items-center gap-3 md:gap-4">
+      <a href="#login" class="btn-secondary btn-sm" style="display:none;" id="nav-login-desktop">Σύνδεση</a>
+      <a href="#login" class="btn-secondary btn-sm nav-links" style="display:none;">Σύνδεση</a>
+      <a href="#login" class="btn-primary btn-sm">Δοκιμή Δωρεάν</a>
+      <button class="mobile-menu-btn" style="display:none;width:36px;height:36px;border-radius:8px;background:transparent;border:1px solid var(--border);color:var(--sec);cursor:pointer;align-items:center;justify-content:center;" onclick="document.getElementById('mobile-nav').classList.toggle('hidden')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+    </div>
+  </div>
+  <!-- Mobile nav -->
+  <div id="mobile-nav" class="hidden" style="padding:12px 24px 20px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:12px;">
+    <a href="#features" style="font-size:14px;color:var(--sec);text-decoration:none;padding:8px 0;">Χαρακτηριστικά</a>
+    <a href="#pricing" style="font-size:14px;color:var(--sec);text-decoration:none;padding:8px 0;">Τιμές</a>
+    <a href="#how" style="font-size:14px;color:var(--sec);text-decoration:none;padding:8px 0;">Πώς Λειτουργεί</a>
+    <a href="#login" style="font-size:14px;color:var(--sec);text-decoration:none;padding:8px 0;">Σύνδεση</a>
   </div>
 </nav>
 
 <!-- ═══════════════════════════════════════════════════════════ -->
-<!-- MAIN CONTENT                                               -->
+<!-- HERO                                                       -->
 <!-- ═══════════════════════════════════════════════════════════ -->
-<main class="flex-1 overflow-y-auto p-4 md:p-7 w-full max-w-[1100px]">
-  
-<!-- ─── DASHBOARD ──────────────────────────────────────────── -->
-<div id="page-dashboard" class="page active">
-  <h1 class="text-[22px] font-bold tracking-tight mb-1">Πίνακας Ελέγχου</h1>
-  <p class="text-[13px] text-ksec mb-6">Επισκόπηση διαχειριζόμενων ακινήτων — Μάρτιος 2026</p>
-
-  <!-- Stats -->
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-7">
-    <div class="bg-kcard border border-kborder rounded-xl p-4">
-      <div class="text-[10.5px] text-kmut font-medium uppercase tracking-wider mb-1.5">Κτίρια</div>
-      <div class="text-[24px] font-bold tracking-tight">2</div>
-      <div class="text-[12px] text-ksec mt-0.5">15 μονάδες</div>
-    </div>
-    <div class="bg-kcard border border-kborder rounded-xl p-4">
-      <div class="text-[10.5px] text-kmut font-medium uppercase tracking-wider mb-1.5">Ένοικοι</div>
-      <div class="text-[24px] font-bold tracking-tight text-kaccent">13</div>
-      <div class="text-[12px] text-ksec mt-0.5">13/15 κατοικημένα</div>
-    </div>
-    <div class="bg-kcard border border-kborder rounded-xl p-4">
-      <div class="text-[10.5px] text-kmut font-medium uppercase tracking-wider mb-1.5">Εκκρεμή</div>
-      <div class="text-[24px] font-bold tracking-tight text-kyellow">€683,40</div>
-      <div class="text-[12px] text-ksec mt-0.5">τρέχουσα περίοδος</div>
-    </div>
-    <div class="bg-kcard border border-kborder rounded-xl p-4">
-      <div class="text-[10.5px] text-kmut font-medium uppercase tracking-wider mb-1.5">Ληξιπρόθεσμα</div>
-      <div class="text-[24px] font-bold tracking-tight text-kred">€214,70</div>
-      <div class="text-[12px] text-ksec mt-0.5">3 λογαριασμοί</div>
-    </div>
-  </div>
- 
-  <!-- Buildings table -->
-  <div class="bg-kcard border border-kborder rounded-xl overflow-hidden mb-4">
-    <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 px-5 py-3.5 border-b border-kborder">
-      <span class="text-[14px] font-semibold">Τα Κτίριά μου</span>
-      <button class="flex w-full sm:w-auto justify-center items-center gap-1.5 bg-kaccent text-white px-3.5 py-1.5 rounded-lg text-[12.5px] font-semibold hover:opacity-90 transition">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Νέο Κτίριο
-      </button>
-    </div>
-    <table class="w-full">
-      <thead>
-        <tr class="border-b border-kborder">
-          <th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Κτίριο</th>
-          <th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Μονάδες</th>
-          <th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Κατοικημένα</th>
-          <th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Εκκρεμή</th>
-          <th class="px-5 py-2.5 w-8"></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr class="row-hover cursor-pointer border-b border-kborder" onclick="navigateTo('building-detail', 'b1')">
-          <td class="px-5 py-3">
-            <div class="flex items-center gap-2.5">
-              <div class="w-9 h-9 rounded-lg bg-kaccent/10 flex items-center justify-center text-kaccent">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22V12h6v10"/><path d="M8 6h.01M16 6h.01M12 6h.01M8 10h.01M16 10h.01M12 10h.01"/></svg>
+<section style="position:relative;padding:140px 24px 80px;overflow:hidden;">
+  <div class="glow-top"></div>
+  <div class="glow-purple"></div>
+  <div style="max-width:1200px;margin:0 auto;">
+    <div class="hero-grid" style="display:flex;align-items:center;gap:60px;">
+      <!-- Left -->
+      <div style="flex:1;min-width:0;">
+        <div class="anim-fade-up" style="margin-bottom:20px;">
+          <span class="badge" style="background:rgba(74,141,248,0.1);color:var(--accent);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Νέα πλατφόρμα — Δοκιμή 14 ημερών δωρεάν</span>
+        </div>
+        <h1 class="font-display hero-headline anim-fade-up anim-delay-1" style="font-size:52px;font-weight:800;line-height:1.08;letter-spacing:-1.5px;margin-bottom:20px;">
+          Τα κοινόχρηστα,<br><span class="gradient-text">επιτέλους ψηφιακά.</span>
+        </h1>
+        <p class="anim-fade-up anim-delay-2" style="font-size:17px;line-height:1.65;color:var(--sec);max-width:480px;margin-bottom:32px;">
+          Αυτοματοποιήστε τον υπολογισμό, τη διανομή και την είσπραξη κοινοχρήστων. Τέλος στα Excel, τα χαρτιά και τις καθυστερήσεις.
+        </p>
+        <div class="hero-buttons anim-fade-up anim-delay-3" style="display:flex;gap:12px;flex-wrap:wrap;">
+          <a href="#login" class="btn-primary">
+            Ξεκινήστε Δωρεάν
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+          </a>
+          <a href="#how" class="btn-secondary">Δείτε πώς λειτουργεί</a>
+        </div>
+        <!-- Mini stats -->
+        <div class="anim-fade-up anim-delay-4" style="display:flex;gap:36px;margin-top:40px;">
+          <div><div class="font-display" style="font-size:28px;font-weight:800;color:var(--text);">250+</div><div style="font-size:12px;color:var(--mut);font-weight:500;">Κτίρια</div></div>
+          <div><div class="font-display" style="font-size:28px;font-weight:800;color:var(--text);">3.400+</div><div style="font-size:12px;color:var(--mut);font-weight:500;">Ένοικοι</div></div>
+          <div><div class="font-display" style="font-size:28px;font-weight:800;color:var(--green);">98%</div><div style="font-size:12px;color:var(--mut);font-weight:500;">Είσπραξη</div></div>
+        </div>
+      </div>
+      <!-- Right: Mockup -->
+      <div class="anim-fade-up anim-delay-4" style="flex:1;min-width:0;position:relative;">
+        <div class="mockup-shadow" style="background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;animation:float 6s ease-in-out infinite;">
+          <!-- Fake dashboard preview -->
+          <div style="padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;">
+            <div style="display:flex;gap:5px;"><div style="width:10px;height:10px;border-radius:50%;background:#ff5f57;"></div><div style="width:10px;height:10px;border-radius:50%;background:#febc2e;"></div><div style="width:10px;height:10px;border-radius:50%;background:#28c840;"></div></div>
+            <div style="flex:1;height:22px;background:var(--bg);border-radius:6px;display:flex;align-items:center;justify-content:center;"><span style="font-size:10px;color:var(--mut);">app.koinoxrista.gr</span></div>
+          </div>
+          <div style="padding:20px;display:flex;gap:14px;">
+            <!-- Mini sidebar -->
+            <div style="width:48px;flex-shrink:0;display:flex;flex-direction:column;gap:6px;align-items:center;padding-top:8px;">
+              <div style="width:28px;height:28px;border-radius:7px;background:var(--accent-g);display:flex;align-items:center;justify-content:center;margin-bottom:12px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div>
+              <div style="width:28px;height:28px;border-radius:6px;background:rgba(74,141,248,0.1);"></div>
+              <div style="width:28px;height:28px;border-radius:6px;background:var(--bg);"></div>
+              <div style="width:28px;height:28px;border-radius:6px;background:var(--bg);"></div>
+              <div style="width:28px;height:28px;border-radius:6px;background:var(--bg);"></div>
+            </div>
+            <!-- Mini content -->
+            <div style="flex:1;min-width:0;">
+              <div style="display:flex;gap:8px;margin-bottom:14px;">
+                <div style="flex:1;height:52px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 10px;">
+                  <div style="font-size:8px;color:var(--mut);text-transform:uppercase;letter-spacing:0.5px;">Κτίρια</div>
+                  <div class="font-display" style="font-size:16px;font-weight:800;margin-top:2px;">2</div>
+                </div>
+                <div style="flex:1;height:52px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 10px;">
+                  <div style="font-size:8px;color:var(--mut);text-transform:uppercase;letter-spacing:0.5px;">Ένοικοι</div>
+                  <div class="font-display" style="font-size:16px;font-weight:800;color:var(--accent);margin-top:2px;">13</div>
+                </div>
+                <div style="flex:1;height:52px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 10px;">
+                  <div style="font-size:8px;color:var(--mut);text-transform:uppercase;letter-spacing:0.5px;">Εκκρεμή</div>
+                  <div class="font-display" style="font-size:16px;font-weight:800;color:var(--yellow);margin-top:2px;">€683</div>
+                </div>
               </div>
-              <div>
-                <div class="text-[13px] font-medium">Λεωφ. Συγγρού 42</div>
-                <div class="text-[11px] text-kmut">Λεωφόρος Συγγρού 42, Αθήνα</div>
+              <!-- Mini bars -->
+              <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px;">
+                <div style="font-size:9px;color:var(--mut);margin-bottom:8px;">Έσοδα vs Έξοδα</div>
+                <div style="display:flex;align-items:flex-end;gap:4px;height:50px;">
+                  <div style="flex:1;display:flex;gap:2px;align-items:flex-end;height:100%;"><div style="flex:1;background:var(--green);border-radius:3px 3px 0 0;height:70%;opacity:0.7;"></div><div style="flex:1;background:var(--accent);border-radius:3px 3px 0 0;height:65%;opacity:0.7;"></div></div>
+                  <div style="flex:1;display:flex;gap:2px;align-items:flex-end;height:100%;"><div style="flex:1;background:var(--green);border-radius:3px 3px 0 0;height:75%;opacity:0.7;"></div><div style="flex:1;background:var(--accent);border-radius:3px 3px 0 0;height:80%;opacity:0.7;"></div></div>
+                  <div style="flex:1;display:flex;gap:2px;align-items:flex-end;height:100%;"><div style="flex:1;background:var(--green);border-radius:3px 3px 0 0;height:90%;opacity:0.7;"></div><div style="flex:1;background:var(--accent);border-radius:3px 3px 0 0;height:85%;opacity:0.7;"></div></div>
+                  <div style="flex:1;display:flex;gap:2px;align-items:flex-end;height:100%;"><div style="flex:1;background:var(--green);border-radius:3px 3px 0 0;height:95%;opacity:0.7;"></div><div style="flex:1;background:var(--accent);border-radius:3px 3px 0 0;height:88%;opacity:0.7;"></div></div>
+                  <div style="flex:1;display:flex;gap:2px;align-items:flex-end;height:100%;"><div style="flex:1;background:var(--green);border-radius:3px 3px 0 0;height:80%;opacity:0.7;"></div><div style="flex:1;background:var(--accent);border-radius:3px 3px 0 0;height:72%;opacity:0.7;"></div></div>
+                </div>
               </div>
             </div>
-          </td>
-          <td class="px-5 py-3 text-[13px] text-ksec">10</td>
-          <td class="px-5 py-3 text-[13px] text-ksec">9/10</td>
-          <td class="px-5 py-3 text-[13px] font-semibold font-mono text-kyellow">€487,20</td>
-          <td class="px-5 py-3 text-ksec"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></td>
-        </tr>
-        <tr class="row-hover cursor-pointer" onclick="navigateTo('building-detail', 'b2')">
-          <td class="px-5 py-3">
-            <div class="flex items-center gap-2.5">
-              <div class="w-9 h-9 rounded-lg bg-kaccent/10 flex items-center justify-center text-kaccent">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22V12h6v10"/><path d="M8 6h.01M16 6h.01M12 6h.01M8 10h.01M16 10h.01M12 10h.01"/></svg>
-              </div>
-              <div>
-                <div class="text-[13px] font-medium">Ερμού 18</div>
-                <div class="text-[11px] text-kmut">Ερμού 18, Νέα Σμύρνη</div>
-              </div>
-            </div>
-          </td>
-          <td class="px-5 py-3 text-[13px] text-ksec">5</td>
-          <td class="px-5 py-3 text-[13px] text-ksec">4/5</td>
-          <td class="px-5 py-3 text-[13px] font-semibold font-mono text-kyellow">€196,20</td>
-          <td class="px-5 py-3 text-ksec"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-    <!-- Recent Activity -->
-  <div class="bg-kcard border border-kborder rounded-xl overflow-hidden">
-    <div class="px-5 py-3.5 border-b border-kborder">
-      <span class="text-[14px] font-semibold">Πρόσφατη Δραστηριότητα</span>
-    </div>
-    <div class="divide-y divide-kborder">
-      <div class="flex items-center gap-3 px-5 py-2.5">
-        <div class="w-7 h-7 rounded-md bg-korange/10 flex items-center justify-center text-korange flex-shrink-0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div>
-        <div class="flex-1 text-[13px] text-ksec">Νέο αίτημα συντήρησης: <span class="text-ktext font-medium">Διαρροή νερού</span> (2Α, Συγγρού 42)</div>
-        <div class="text-[11px] text-kmut flex-shrink-0">2 ώρες πριν</div>
-      </div>
-      <div class="flex items-center gap-3 px-5 py-2.5">
-        <div class="w-7 h-7 rounded-md bg-kgreen/10 flex items-center justify-center text-kgreen flex-shrink-0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 10h12M4 14h12M6 6c1.5-2 3.5-3 6-3 4.42 0 8 3.58 8 8s-3.58 8-8 8c-2.5 0-4.5-1-6-3"/></svg></div>
-        <div class="flex-1 text-[13px] text-ksec">Πληρωμή <span class="text-kgreen font-medium font-mono">€95,40</span> από Σοφία Ιωάννου (5Α)</div>
-        <div class="text-[11px] text-kmut flex-shrink-0">5 ώρες πριν</div>
-      </div>
-      <div class="flex items-center gap-3 px-5 py-2.5">
-        <div class="w-7 h-7 rounded-md bg-kaccent/10 flex items-center justify-center text-kaccent flex-shrink-0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 11 18-5v12L3 13v-2z"/></svg></div>
-        <div class="flex-1 text-[13px] text-ksec">Νέα ανακοίνωση: <span class="text-ktext font-medium">Βλάβη κεντρικής πόρτας</span> (Ερμού 18)</div>
-        <div class="text-[11px] text-kmut flex-shrink-0">χθες</div>
-      </div>
-      <div class="flex items-center gap-3 px-5 py-2.5">
-        <div class="w-7 h-7 rounded-md bg-kgreen/10 flex items-center justify-center text-kgreen flex-shrink-0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
-        <div class="flex-1 text-[13px] text-ksec">Επιλύθηκε: <span class="text-ktext font-medium">Θόρυβος ασανσέρ</span> (Συγγρού 42)</div>
-        <div class="text-[11px] text-kmut flex-shrink-0">3 μέρες πριν</div>
-      </div>
-    </div>
-  </div>
-</div>
-<!-- ─── BUILDINGS LIST ─────────────────────────────────────── --> 
-<div id="page-buildings" class="page">
-  <h1 class="text-[22px] font-bold tracking-tight mb-1">Κτίρια</h1>
-  <p class="text-[13px] text-ksec mb-6">Διαχείριση όλων των κτιρίων</p>
-  <div class="grid grid-cols-2 gap-4" id="buildings-grid"></div>
-</div>
-
-<!-- ─── BUILDING DETAIL ────────────────────────────────────── -->
-<div id="page-building-detail" class="page">
-  <button onclick="navigateTo('buildings')" class="flex items-center gap-1 text-[13px] text-ksec mb-4 hover:text-kaccent transition">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg> Πίσω
-  </button>
-  <div id="building-detail-content"></div>
-</div>
-
-<!-- ─── TENANTS ────────────────────────────────────────────── -->
-<div id="page-tenants" class="page">
-  <h1 class="text-[22px] font-bold tracking-tight mb-1">Ένοικοι & Ιδιοκτήτες</h1>
-  <p class="text-[13px] text-ksec mb-6">Διαχείριση προσώπων σε όλα τα κτίρια</p>
-  <div class="flex flex-col md:flex-row justify-between md:items-center gap-3 mb-4">
-    <div class="flex flex-wrap gap-1.5" id="tenant-filters"></div>
-    <div class="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
-      <div class="relative w-full sm:w-auto">
-        <svg class="absolute left-2.5 top-1/2 -translate-y-1/2 text-kmut" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-        <input id="tenant-search" type="text" placeholder="Αναζήτηση ενοίκων..." class="w-full sm:w-56 bg-kbg border border-kborder rounded-lg pl-8 pr-3 py-2 text-[13px] text-ktext" oninput="renderTenants()">
-      </div>
-      <button class="flex w-full sm:w-auto justify-center items-center gap-1.5 bg-kaccent text-white px-3.5 py-1.5 rounded-lg text-[12.5px] font-semibold hover:opacity-90 transition">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Νέος Ένοικος
-       </button>
-    </div>
-  </div>
-  <div class="bg-kcard border border-kborder rounded-xl overflow-hidden" id="tenants-table-wrap"></div>
-</div>
-
-<!-- ─── BILLING ────────────────────────────────────────────── -->
-<div id="page-billing" class="page">
-  <h1 class="text-[22px] font-bold tracking-tight mb-1">Κοινόχρηστα</h1>
-  <p class="text-[13px] text-ksec mb-6">Υπολογισμός και διαχείριση κοινοχρήστων δαπανών</p>
-  <div class="flex flex-col gap-3" id="billing-list"></div>
-</div>
-
-<!-- ─── ANNOUNCEMENTS ──────────────────────────────────────── -->
-<div id="page-announcements" class="page">
-  <h1 class="text-[22px] font-bold tracking-tight mb-1">Ανακοινώσεις</h1>
-  <p class="text-[13px] text-ksec mb-6">Ενημερώσεις και ειδοποιήσεις προς τους ενοίκους</p>
-  <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-5">
-    <div class="flex flex-wrap gap-1.5" id="announcement-filters"></div>
-    <button class="flex w-full sm:w-auto justify-center items-center gap-1.5 bg-kaccent text-white px-3.5 py-1.5 rounded-lg text-[12.5px] font-semibold hover:opacity-90 transition">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      Νέα Ανακοίνωση
-    </button>
-  </div>
-  <div class="flex flex-col gap-3" id="announcements-list"></div>
-</div>
-
-<!-- ─── MAINTENANCE ────────────────────────────────────────── -->
-<div id="page-maintenance" class="page">
-  <h1 class="text-[22px] font-bold tracking-tight mb-1">Αιτήματα Συντήρησης</h1>
-  <p class="text-[13px] text-ksec mb-6">Διαχείριση βλαβών και αιτημάτων επισκευής</p>
-  <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
-    <div class="bg-kcard border border-kborder rounded-xl p-4">
-      <div class="text-[10.5px] text-kmut font-medium uppercase tracking-wider mb-1.5">Συνολικά</div>
-      <div class="text-[24px] font-bold tracking-tight">6</div>
-    </div>
-    <div class="bg-kcard border border-kborder rounded-xl p-4">
-      <div class="text-[10.5px] text-kmut font-medium uppercase tracking-wider mb-1.5">Ανοιχτά</div>
-      <div class="text-[24px] font-bold tracking-tight text-korange">5</div>
-    </div>
-    <div class="bg-kcard border border-kborder rounded-xl p-4">
-      <div class="text-[10.5px] text-kmut font-medium uppercase tracking-wider mb-1.5">Επιλυμένα</div>
-      <div class="text-[24px] font-bold tracking-tight text-kgreen">1</div>
-    </div>
-  </div>
-  <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-5">
-    <div class="flex gap-1.5 flex-wrap" id="maint-filters"></div>
-    <button class="flex w-full sm:w-auto justify-center items-center gap-1.5 bg-kaccent text-white px-3.5 py-1.5 rounded-lg text-[12.5px] font-semibold hover:opacity-90 transition">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      Νέο Αίτημα
-    </button>
-  </div>
-  <div class="bg-kcard border border-kborder rounded-xl overflow-hidden" id="maint-table-wrap"></div>
-</div>
-
-<!-- ─── DOCUMENTS ──────────────────────────────────────────── -->
-<div id="page-documents" class="page">
-  <h1 class="text-[22px] font-bold tracking-tight mb-1">Έγγραφα</h1>
-  <p class="text-[13px] text-ksec mb-6">Συμβάσεις, ασφαλιστήρια, πρακτικά και άλλα έγγραφα</p>
-  <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-5">
-    <div class="flex gap-1.5 flex-wrap" id="doc-filters"></div>
-    <button class="flex w-full sm:w-auto justify-center items-center gap-1.5 bg-kaccent text-white px-3.5 py-1.5 rounded-lg text-[12.5px] font-semibold hover:opacity-90 transition">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      Ανέβασμα
-    </button>
-  </div>
-  <div class="bg-kcard border border-kborder rounded-xl overflow-hidden" id="docs-table-wrap"></div>
-</div>
-
-<!-- ─── REPORTS ────────────────────────────────────────────── -->
-<div id="page-reports" class="page">
-  <h1 class="text-[22px] font-bold tracking-tight mb-1">Αναφορές & Στατιστικά</h1>
-  <p class="text-[13px] text-ksec mb-6">Οικονομική επισκόπηση και τάσεις</p>
-
-  <div class="grid grid-cols-4 gap-3 mb-7">
-    <div class="bg-kcard border border-kborder rounded-xl p-4">
-      <div class="text-[10.5px] text-kmut font-medium uppercase tracking-wider mb-1.5">Έσοδα (Φεβ)</div>
-      <div class="text-[24px] font-bold tracking-tight text-kgreen">€1.727</div>
-      <div class="text-[12px] text-kgreen mt-0.5 flex items-center gap-1"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg> +5.2%</div>
-    </div>
-    <div class="bg-kcard border border-kborder rounded-xl p-4">
-      <div class="text-[10.5px] text-kmut font-medium uppercase tracking-wider mb-1.5">Έξοδα (Φεβ)</div>
-      <div class="text-[24px] font-bold tracking-tight text-kaccent">€1.410</div>
-      <div class="text-[12px] text-ksec mt-0.5">9 κατηγορίες</div>
-    </div>
-    <div class="bg-kcard border border-kborder rounded-xl p-4">
-      <div class="text-[10.5px] text-kmut font-medium uppercase tracking-wider mb-1.5">Ποσοστό Είσπραξης</div>
-      <div class="text-[24px] font-bold tracking-tight text-kgreen">73%</div>
-      <div class="text-[12px] text-ksec mt-0.5">11/15 πληρώθηκαν</div>
-    </div>
-    <div class="bg-kcard border border-kborder rounded-xl p-4">
-      <div class="text-[10.5px] text-kmut font-medium uppercase tracking-wider mb-1.5">Μέσος χρόνος πληρωμής</div>
-      <div class="text-[24px] font-bold tracking-tight">8.3 μέρες</div>
-      <div class="text-[12px] text-ksec mt-0.5">μετά την έκδοση</div>
-    </div>
-  </div>
-
-  <!-- Chart -->
-  <div class="bg-kcard border border-kborder rounded-xl overflow-x-auto mb-4">
-    <div class="px-5 py-3.5 border-b border-kborder flex justify-between items-center">
-      <span class="text-[14px] font-semibold">Έσοδα vs Έξοδα — Τελευταίο 6μηνο</span>
-      <div class="flex gap-4">
-        <div class="flex items-center gap-1.5 text-[12px] text-ksec"><div class="w-3 h-3 rounded bg-kgreen"></div> Έσοδα</div>
-        <div class="flex items-center gap-1.5 text-[12px] text-ksec"><div class="w-3 h-3 rounded bg-kaccent"></div> Έξοδα</div>
-      </div>
-    </div>
-    <div class="p-5" id="chart-container"></div>
-  </div>
-
-  <!-- Expense categories -->
-  <div class="bg-kcard border border-kborder rounded-xl overflow-hidden">
-    <div class="px-5 py-3.5 border-b border-kborder">
-      <span class="text-[14px] font-semibold">Κατανομή Εξόδων ανά Κατηγορία</span>
-    </div>
-    <div class="p-5" id="expense-categories"></div>
-  </div>
-</div>
-
-<!-- ─── SETTINGS ───────────────────────────────────────────── -->
-<div id="page-settings" class="page">
-  <h1 class="text-[22px] font-bold tracking-tight mb-1">Ρυθμίσεις</h1>
-  <p class="text-[13px] text-ksec mb-6">Διαχείριση λογαριασμού και προτιμήσεων</p>
-
-  <!-- Tabs -->
-  <div class="flex gap-1 border-b border-kborder mb-5" id="settings-tabs">
-    <button onclick="switchSettingsTab('org')" class="settings-tab px-4 py-2.5 text-[13px] font-semibold text-kaccent border-b-2 border-kaccent" data-tab="org">Οργανισμός</button>
-    <button onclick="switchSettingsTab('billing-s')" class="settings-tab px-4 py-2.5 text-[13px] text-ksec border-b-2 border-transparent" data-tab="billing-s">Χρεώσεις</button>
-    <button onclick="switchSettingsTab('notifs')" class="settings-tab px-4 py-2.5 text-[13px] text-ksec border-b-2 border-transparent" data-tab="notifs">Ειδοποιήσεις</button>
-    <button onclick="switchSettingsTab('team')" class="settings-tab px-4 py-2.5 text-[13px] text-ksec border-b-2 border-transparent" data-tab="team">Ομάδα</button>
-  </div>
-
-  <!-- Org tab -->
-  <div id="stab-org" class="settings-panel">
-    <div class="bg-kcard border border-kborder rounded-xl overflow-hidden">
-      <div class="px-5 py-3.5 border-b border-kborder"><span class="text-[14px] font-semibold">Στοιχεία Οργανισμού</span></div>
-      <div class="p-5">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div><label class="block text-[12px] font-medium text-ksec mb-1.5">Επωνυμία</label><input class="w-full bg-kbg border border-kborder rounded-lg px-3 py-2 text-[13px] text-ktext" value="Κώστας Μιχαηλίδης — Διαχείριση Ακινήτων"></div>
-          <div><label class="block text-[12px] font-medium text-ksec mb-1.5">ΑΦΜ</label><input class="w-full bg-kbg border border-kborder rounded-lg px-3 py-2 text-[13px] text-ktext font-mono" value="123456789"></div>
-          <div><label class="block text-[12px] font-medium text-ksec mb-1.5">ΔΟΥ</label><input class="w-full bg-kbg border border-kborder rounded-lg px-3 py-2 text-[13px] text-ktext" value="Νέας Σμύρνης"></div>
-          <div><label class="block text-[12px] font-medium text-ksec mb-1.5">Email</label><input class="w-full bg-kbg border border-kborder rounded-lg px-3 py-2 text-[13px] text-ktext" value="info@koinoxrista-km.gr"></div>
-          <div><label class="block text-[12px] font-medium text-ksec mb-1.5">Τηλέφωνο</label><input class="w-full bg-kbg border border-kborder rounded-lg px-3 py-2 text-[13px] text-ktext font-mono" value="210 1234567"></div>
-          <div><label class="block text-[12px] font-medium text-ksec mb-1.5">Γλώσσα</label><select class="w-full bg-kbg border border-kborder rounded-lg px-3 py-2 text-[13px] text-ktext"><option>Ελληνικά</option><option>English</option></select></div>
-          <div class="col-span-2"><label class="block text-[12px] font-medium text-ksec mb-1.5">Διεύθυνση</label><input class="w-full bg-kbg border border-kborder rounded-lg px-3 py-2 text-[13px] text-ktext" value="Λεωφ. Ελ. Βενιζέλου 74, Νέα Σμύρνη 171 21"></div>
-        </div>
-        <div class="flex justify-end mt-5"><button class="bg-kaccent text-white px-4 py-2 rounded-lg text-[13px] font-semibold hover:opacity-90 transition">Αποθήκευση</button></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Billing settings tab -->
-  <div id="stab-billing-s" class="settings-panel hidden">
-    <div class="bg-kcard border border-kborder rounded-xl overflow-hidden">
-      <div class="px-5 py-3.5 border-b border-kborder"><span class="text-[14px] font-semibold">Ρυθμίσεις Χρεώσεων</span></div>
-      <div class="p-5">
-        <div class="grid grid-cols-2 gap-4 mb-5">
-          <div><label class="block text-[12px] font-medium text-ksec mb-1.5">Προεπιλεγμένη ημ/νία λήξης (μέρες)</label><input type="number" class="w-full bg-kbg border border-kborder rounded-lg px-3 py-2 text-[13px] text-ktext font-mono" value="15"></div>
-          <div><label class="block text-[12px] font-medium text-ksec mb-1.5">Νόμισμα</label><input class="w-full bg-kbg border border-kborder rounded-lg px-3 py-2 text-[13px] text-kmut" value="EUR" disabled></div>
-        </div>
-        <div class="border-t border-kborder pt-5 space-y-5">
-          <div class="flex justify-between items-center">
-            <div><div class="text-[13px] font-medium">Αυτόματη υπενθύμιση πληρωμής</div><div class="text-[12px] text-kmut mt-0.5">Αποστολή email 3 μέρες πριν τη λήξη</div></div>
-            <button class="toggle-track w-10 h-[22px] rounded-full bg-kaccent relative" onclick="this.classList.toggle('bg-kaccent');this.classList.toggle('bg-kborder');this.querySelector('div').classList.toggle('left-[21px]');this.querySelector('div').classList.toggle('left-[3px]')"><div class="toggle-dot w-4 h-4 rounded-full bg-white absolute top-[3px] left-[21px]"></div></button>
-          </div>
-          <div class="flex justify-between items-center">
-            <div><div class="text-[13px] font-medium">Αυτόματη προσαύξηση εκπρόθεσμων</div><div class="text-[12px] text-kmut mt-0.5">Προσθήκη 2% μετά από 30 μέρες καθυστέρηση</div></div>
-            <button class="toggle-track w-10 h-[22px] rounded-full bg-kborder relative" onclick="this.classList.toggle('bg-kaccent');this.classList.toggle('bg-kborder');this.querySelector('div').classList.toggle('left-[21px]');this.querySelector('div').classList.toggle('left-[3px]')"><div class="toggle-dot w-4 h-4 rounded-full bg-white absolute top-[3px] left-[3px]"></div></button>
-          </div>
-        </div>
-        <div class="border-t border-kborder pt-5 mt-5">
-          <div class="text-[10.5px] text-kmut font-medium uppercase tracking-wider mb-3">Μέθοδοι Πληρωμής</div>
-          <div class="grid grid-cols-2 gap-3">
-            <div class="bg-kbg border border-kborder rounded-lg p-3 flex justify-between items-center"><span class="text-[13px] font-medium">Κάρτα (Stripe)</span><span class="text-[11px] font-semibold text-kgreen bg-kgreen/10 px-2 py-0.5 rounded-full">Ενεργό</span></div>
-            <div class="bg-kbg border border-kborder rounded-lg p-3 flex justify-between items-center"><span class="text-[13px] font-medium">IRIS</span><span class="text-[11px] font-semibold text-kyellow bg-kyellow/10 px-2 py-0.5 rounded-full">Ρύθμιση</span></div>
-            <div class="bg-kbg border border-kborder rounded-lg p-3 flex justify-between items-center"><span class="text-[13px] font-medium">Τραπεζικό Έμβασμα</span><span class="text-[11px] font-semibold text-kgreen bg-kgreen/10 px-2 py-0.5 rounded-full">Ενεργό</span></div>
-            <div class="bg-kbg border border-kborder rounded-lg p-3 flex justify-between items-center"><span class="text-[13px] font-medium">Μετρητά</span><span class="text-[11px] font-semibold text-kgreen bg-kgreen/10 px-2 py-0.5 rounded-full">Ενεργό</span></div>
           </div>
         </div>
       </div>
     </div>
   </div>
+</section>
 
-  <!-- Notifications tab -->
-  <div id="stab-notifs" class="settings-panel hidden">
-    <div class="bg-kcard border border-kborder rounded-xl overflow-hidden">
-      <div class="px-5 py-3.5 border-b border-kborder"><span class="text-[14px] font-semibold">Ειδοποιήσεις</span></div>
-      <div class="p-5 divide-y divide-kborder">
-        <div class="flex justify-between items-center py-3.5 first:pt-0">
-          <div><div class="text-[13px] font-medium">Ειδοποιήσεις email</div><div class="text-[12px] text-kmut mt-0.5">Λήψη email για νέα αιτήματα και πληρωμές</div></div>
-          <button class="toggle-track w-10 h-[22px] rounded-full bg-kaccent relative" onclick="this.classList.toggle('bg-kaccent');this.classList.toggle('bg-kborder');this.querySelector('div').classList.toggle('left-[21px]');this.querySelector('div').classList.toggle('left-[3px]')"><div class="toggle-dot w-4 h-4 rounded-full bg-white absolute top-[3px] left-[21px]"></div></button>
-        </div>
-        <div class="flex justify-between items-center py-3.5">
-          <div><div class="text-[13px] font-medium">Υπενθύμιση λογαριασμών</div><div class="text-[12px] text-kmut mt-0.5">Αυτόματη αποστολή στους ενοίκους</div></div>
-          <button class="toggle-track w-10 h-[22px] rounded-full bg-kaccent relative" onclick="this.classList.toggle('bg-kaccent');this.classList.toggle('bg-kborder');this.querySelector('div').classList.toggle('left-[21px]');this.querySelector('div').classList.toggle('left-[3px]')"><div class="toggle-dot w-4 h-4 rounded-full bg-white absolute top-[3px] left-[21px]"></div></button>
-        </div>
-        <div class="flex justify-between items-center py-3.5">
-          <div><div class="text-[13px] font-medium">Νέο αίτημα συντήρησης</div><div class="text-[12px] text-kmut mt-0.5">Ειδοποίηση κατά την υποβολή αιτήματος</div></div>
-          <button class="toggle-track w-10 h-[22px] rounded-full bg-kaccent relative" onclick="this.classList.toggle('bg-kaccent');this.classList.toggle('bg-kborder');this.querySelector('div').classList.toggle('left-[21px]');this.querySelector('div').classList.toggle('left-[3px]')"><div class="toggle-dot w-4 h-4 rounded-full bg-white absolute top-[3px] left-[21px]"></div></button>
-        </div>
-        <div class="flex justify-between items-center py-3.5 last:pb-0">
-          <div><div class="text-[13px] font-medium">Επιβεβαίωση πληρωμής</div><div class="text-[12px] text-kmut mt-0.5">Email επιβεβαίωσης στον ένοικο μετά την πληρωμή</div></div>
-          <button class="toggle-track w-10 h-[22px] rounded-full bg-kaccent relative" onclick="this.classList.toggle('bg-kaccent');this.classList.toggle('bg-kborder');this.querySelector('div').classList.toggle('left-[21px]');this.querySelector('div').classList.toggle('left-[3px]')"><div class="toggle-dot w-4 h-4 rounded-full bg-white absolute top-[3px] left-[21px]"></div></button>
-        </div>
-      </div>
+<!-- ── Trusted by bar ── -->
+<section style="padding:20px 24px 60px;">
+  <div style="max-width:1200px;margin:0 auto;">
+    <div class="stats-bar reveal" style="display:flex;justify-content:center;align-items:center;gap:48px;padding:24px 40px;background:var(--surface);border:1px solid var(--border);border-radius:14px;">
+      <div style="text-align:center;"><div class="font-display" style="font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:1px;font-weight:600;">Αθήνα</div></div>
+      <div style="width:1px;height:20px;background:var(--border);"></div>
+      <div style="text-align:center;"><div class="font-display" style="font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:1px;font-weight:600;">Θεσσαλονίκη</div></div>
+      <div style="width:1px;height:20px;background:var(--border);"></div>
+      <div style="text-align:center;"><div class="font-display" style="font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:1px;font-weight:600;">Πάτρα</div></div>
+      <div style="width:1px;height:20px;background:var(--border);"></div>
+      <div style="text-align:center;"><div class="font-display" style="font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:1px;font-weight:600;">Ηράκλειο</div></div>
+      <div style="width:1px;height:20px;background:var(--border);"></div>
+      <div style="text-align:center;"><div class="font-display" style="font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:1px;font-weight:600;">Λάρισα</div></div>
     </div>
   </div>
-
-  <!-- Team tab -->
-  <div id="stab-team" class="settings-panel hidden">
-    <div class="bg-kcard border border-kborder rounded-xl overflow-x-auto">
-      <div class="px-5 py-3.5 border-b border-kborder flex justify-between items-center">
-        <span class="text-[14px] font-semibold">Μέλη Ομάδας</span>
-        <button class="flex items-center gap-1.5 bg-kaccent text-white px-3.5 py-1.5 rounded-lg text-[12.5px] font-semibold hover:opacity-90 transition">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Πρόσκληση
-        </button>
-      </div>
-      <table class="w-full">
-        <thead><tr class="border-b border-kborder"><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Μέλος</th><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Email</th><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Ρόλος</th><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Κατάσταση</th></tr></thead>
-        <tbody>
-          <tr class="border-b border-kborder"><td class="px-5 py-3"><div class="flex items-center gap-2.5"><div class="w-8 h-8 rounded-full bg-gradient-to-br from-kgreen to-emerald-700 flex items-center justify-center text-white text-[11px] font-bold">ΚΜ</div><span class="text-[13px] font-medium">Κώστας Μιχαηλίδης</span></div></td><td class="px-5 py-3 text-[13px] text-ksec"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="d6bdb9a5a2b7a596bdb9bfb8b9aea4bfa5a2b7fbbdbbf8b1a4">[email&#160;protected]</a></td><td class="px-5 py-3"><span class="text-[11px] font-semibold text-kaccent bg-kaccent/10 px-2 py-0.5 rounded-full">Ιδιοκτήτης</span></td><td class="px-5 py-3"><span class="text-[11px] font-semibold text-kgreen bg-kgreen/10 px-2 py-0.5 rounded-full">Ενεργός</span></td></tr>
-          <tr class="border-b border-kborder"><td class="px-5 py-3"><div class="flex items-center gap-2.5"><div class="w-8 h-8 rounded-full bg-gradient-to-br from-kaccent to-kaccentd flex items-center justify-center text-white text-[11px] font-bold">ΕΠ</div><span class="text-[13px] font-medium">Ελένη Παπανδρέου</span></div></td><td class="px-5 py-3 text-[13px] text-ksec"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="d4b1b8b1babd94bfbbbdbabbaca6bda7a0b5f9bfb9fab3a6">[email&#160;protected]</a></td><td class="px-5 py-3"><span class="text-[11px] font-semibold text-korange bg-korange/10 px-2 py-0.5 rounded-full">Διαχειριστής</span></td><td class="px-5 py-3"><span class="text-[11px] font-semibold text-kgreen bg-kgreen/10 px-2 py-0.5 rounded-full">Ενεργός</span></td></tr>
-          <tr><td class="px-5 py-3"><div class="flex items-center gap-2.5"><div class="w-8 h-8 rounded-full bg-kbg border border-dashed border-kborder flex items-center justify-center text-kmut text-[11px] font-bold">?</div><span class="text-[13px] font-medium text-ksec"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="c8a9ababa7bda6bca1a6af88bca9b0a7aeaea1abade6afba">[email&#160;protected]</a></span></div></td><td class="px-5 py-3 text-[13px] text-ksec"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="08696b6b677d667c61666f487c6970676e6e616b6d266f7a">[email&#160;protected]</a></td><td class="px-5 py-3"><span class="text-[11px] font-semibold text-ksec bg-kbg px-2 py-0.5 rounded-full">Αναγνώστης</span></td><td class="px-5 py-3"><span class="text-[11px] font-semibold text-kyellow bg-kyellow/10 px-2 py-0.5 rounded-full">Σε αναμονή</span></td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
-</main>
+</section>
 
 <!-- ═══════════════════════════════════════════════════════════ -->
-<!-- DATA + LOGIC                                               -->
+<!-- FEATURES                                                   -->
 <!-- ═══════════════════════════════════════════════════════════ -->
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-// ─── Data ────────────────────────────────────────────────────
-const DATA = {
-  buildings: [
-    { id:"b1", name:"Λεωφ. Συγγρού 42", address:"Λεωφόρος Συγγρού 42, Αθήνα", floors:6, totalMillesimal:1000, hasElevator:true, hasCentralHeating:true,
-      units:[
-        {id:"u1",label:"1Α",floor:1,type:"apartment",sqm:72,mill:85,tenant:{name:"Γιώργος Παπαδόπουλος",email:"g.papadopoulos@email.gr",phone:"6971234567",role:"renter"},occupied:true},
-        {id:"u2",label:"1Β",floor:1,type:"apartment",sqm:65,mill:78,tenant:{name:"Μαρία Κωνσταντίνου",email:"m.konstantinou@email.gr",phone:"6982345678",role:"owner"},occupied:true},
-        {id:"u3",label:"2Α",floor:2,type:"apartment",sqm:72,mill:85,tenant:{name:"Νίκος Αλεξίου",email:"n.alexiou@email.gr",phone:"6993456789",role:"renter"},occupied:true},
-        {id:"u4",label:"2Β",floor:2,type:"apartment",sqm:65,mill:78,tenant:{name:"Ελένη Δημητρίου",email:"e.dimitriou@email.gr",phone:"6944567890",role:"renter"},occupied:true},
-        {id:"u5",label:"3Α",floor:3,type:"apartment",sqm:80,mill:95,tenant:{name:"Κώστας Βασιλείου",email:"k.vasiliou@email.gr",phone:"6975678901",role:"owner"},occupied:true},
-        {id:"u6",label:"3Β",floor:3,type:"apartment",sqm:58,mill:68,tenant:null,occupied:false},
-        {id:"u7",label:"4Α",floor:4,type:"apartment",sqm:90,mill:110,tenant:{name:"Αναστασία Γεωργίου",email:"a.georgiou@email.gr",phone:"6986789012",role:"renter"},occupied:true},
-        {id:"u8",label:"4Β",floor:4,type:"apartment",sqm:65,mill:78,tenant:{name:"Δημήτρης Νικολάου",email:"d.nikolaou@email.gr",phone:"6937890123",role:"owner"},occupied:true},
-        {id:"u9",label:"5Α",floor:5,type:"apartment",sqm:95,mill:115,tenant:{name:"Σοφία Ιωάννου",email:"s.ioannou@email.gr",phone:"6948901234",role:"renter"},occupied:true},
-        {id:"u10",label:"Ισόγειο",floor:0,type:"shop",sqm:120,mill:108,tenant:{name:"Ανδρέας Χρήστου",email:"a.christou@email.gr",phone:"6959012345",role:"renter"},occupied:true},
-      ],
-      expenses:[
-        {cat:"Ηλεκτρικό κοινοχρήστων",desc:"ΔΕΗ Φεβ 2026",amount:342.50},
-        {cat:"Καθαρισμός",desc:"Μηνιαίο — Φεβ",amount:180},
-        {cat:"Ασανσέρ — Συντήρηση",desc:"Τριμηνιαία συντ.",amount:150},
-        {cat:"Νερό κοινόχρηστο",desc:"ΕΥΔΑΠ Φεβ 2026",amount:95.20},
-        {cat:"Ασφάλεια κτιρίου",desc:"Ετήσιο (1/12)",amount:45},
-        {cat:"Αμοιβή διαχειριστή",desc:"Φεβρουάριος",amount:200},
-      ]
-    },
-    { id:"b2", name:"Ερμού 18", address:"Ερμού 18, Νέα Σμύρνη", floors:4, totalMillesimal:1000, hasElevator:false, hasCentralHeating:false,
-      units:[
-        {id:"u11",label:"1ος",floor:1,type:"apartment",sqm:85,mill:180,tenant:{name:"Πέτρος Μακρής",email:"p.makris@email.gr",phone:"6970111222",role:"owner"},occupied:true},
-        {id:"u12",label:"2ος",floor:2,type:"apartment",sqm:85,mill:180,tenant:{name:"Άννα Σταύρου",email:"a.stavrou@email.gr",phone:"6980222333",role:"renter"},occupied:true},
-        {id:"u13",label:"3ος",floor:3,type:"apartment",sqm:90,mill:200,tenant:null,occupied:false},
-        {id:"u14",label:"4ος",floor:4,type:"apartment",sqm:100,mill:250,tenant:{name:"Χρήστος Παντελής",email:"c.pantelis@email.gr",phone:"6990333444",role:"owner"},occupied:true},
-        {id:"u15",label:"Ισόγειο",floor:0,type:"shop",sqm:60,mill:190,tenant:{name:"Καφέ Νέα Σμύρνη ΟΕ",email:"info@cafe-ns.gr",phone:"2109876543",role:"renter"},occupied:true},
-      ],
-      expenses:[
-        {cat:"Ηλεκτρικό κοινοχρήστων",desc:"ΔΕΗ Φεβ 2026",amount:128},
-        {cat:"Καθαρισμός",desc:"Μηνιαίο — Φεβ",amount:120},
-        {cat:"Αμοιβή διαχειριστή",desc:"Φεβρουάριος",amount:150},
-      ]
-    }
-  ],
-  announcements: [
-    {id:"a1",bid:"b1",bname:"Λεωφ. Συγγρού 42",title:"Διακοπή νερού — Τετάρτη 5/3",body:"Λόγω εργασιών της ΕΥΔΑΠ θα γίνει διακοπή νερού την Τετάρτη 5 Μαρτίου από 09:00 έως 14:00. Παρακαλούμε αποθηκεύστε νερό.",priority:"high",pinned:true,date:"2026-03-01T10:00:00"},
-    {id:"a2",bid:"b1",bname:"Λεωφ. Συγγρού 42",title:"Ετήσια γενική συνέλευση",body:"Η ετήσια ΓΣ θα πραγματοποιηθεί την Κυριακή 15/3 στις 18:00 στον κοινόχρηστο χώρο ισογείου.",priority:"normal",pinned:true,date:"2026-02-28T09:00:00"},
-    {id:"a3",bid:"b1",bname:"Λεωφ. Συγγρού 42",title:"Συντήρηση ασανσέρ",body:"Η συντήρηση θα γίνει Δευτέρα 10/3, 10:00-12:00. Το ασανσέρ θα είναι εκτός λειτουργίας.",priority:"normal",pinned:false,date:"2026-02-25T14:00:00"},
-    {id:"a4",bid:"b2",bname:"Ερμού 18",title:"Βλάβη κεντρικής πόρτας",body:"Η κεντρική πόρτα δεν κλείνει αυτόματα. Κλήθηκε τεχνικός. Κλείνετε χειροκίνητα.",priority:"urgent",pinned:true,date:"2026-03-02T16:30:00"},
-    {id:"a5",bid:"b2",bname:"Ερμού 18",title:"Κανονισμός κοινοχρήστων χώρων",body:"Η τοποθέτηση αντικειμένων στα πλατύσκαλα απαγορεύεται.",priority:"low",pinned:false,date:"2026-02-20T11:00:00"},
-  ],
-  maintenance: [
-    {id:"m1",bid:"b1",bname:"Λεωφ. Συγγρού 42",unit:"2Α",title:"Διαρροή νερού στο μπάνιο",desc:"Διαρροή από σωλήνα κάτω από τον νιπτήρα.",status:"in_progress",priority:"high",by:"Νίκος Αλεξίου",date:"2026-02-27",assigned:"Υδραυλικός Κώστα"},
-    {id:"m2",bid:"b1",bname:"Λεωφ. Συγγρού 42",unit:null,title:"Λάμπα καμένη στο κλιμακοστάσιο 3ου",desc:"Η λάμπα στο πλατύσκαλο 3ου ορόφου δεν ανάβει.",status:"submitted",priority:"normal",by:"Κώστας Βασιλείου",date:"2026-03-01",assigned:null},
-    {id:"m3",bid:"b1",bname:"Λεωφ. Συγγρού 42",unit:"4Α",title:"Ρωγμή στον τοίχο σαλονιού",desc:"Ρωγμή στον εξωτερικό τοίχο κοντά στο παράθυρο.",status:"acknowledged",priority:"normal",by:"Αναστασία Γεωργίου",date:"2026-02-28",assigned:null},
-    {id:"m4",bid:"b1",bname:"Λεωφ. Συγγρού 42",unit:null,title:"Θόρυβος ασανσέρ",desc:"Τρίξιμο μεταξύ 3ου και 4ου ορόφου.",status:"resolved",priority:"high",by:"Δημήτρης Νικολάου",date:"2026-02-15",assigned:"ThyssenKrupp Ελλάς"},
-    {id:"m5",bid:"b2",bname:"Ερμού 18",unit:"2ος",title:"Βλάβη θυροτηλεφώνου",desc:"Δεν λειτουργεί κουδούνι ούτε άνοιγμα πόρτας.",status:"in_progress",priority:"high",by:"Άννα Σταύρου",date:"2026-02-26",assigned:"Ηλεκτρολόγος Παπά"},
-    {id:"m6",bid:"b2",bname:"Ερμού 18",unit:null,title:"Καθαρισμός υπογείου",desc:"Συσσώρευση σκόνης και σκουπιδιών.",status:"submitted",priority:"low",by:"Πέτρος Μακρής",date:"2026-03-02",assigned:null},
-  ],
-  documents: [
-    {id:"d1",bid:"b1",bname:"Λεωφ. Συγγρού 42",name:"Κανονισμός Πολυκατοικίας",cat:"contract",size:"245 KB",date:"2025-06-15"},
-    {id:"d2",bid:"b1",bname:"Λεωφ. Συγγρού 42",name:"Ασφαλιστήριο Συμβόλαιο 2026",cat:"insurance",size:"1.2 MB",date:"2026-01-10"},
-    {id:"d3",bid:"b1",bname:"Λεωφ. Συγγρού 42",name:"Πρακτικά ΓΣ — Σεπ 2025",cat:"minutes",size:"89 KB",date:"2025-09-20"},
-    {id:"d4",bid:"b1",bname:"Λεωφ. Συγγρού 42",name:"Σύμβαση Καθαρίστριας",cat:"contract",size:"156 KB",date:"2025-11-01"},
-    {id:"d5",bid:"b1",bname:"Λεωφ. Συγγρού 42",name:"Σύμβαση Ασανσέρ",cat:"contract",size:"312 KB",date:"2025-03-01"},
-    {id:"d6",bid:"b1",bname:"Λεωφ. Συγγρού 42",name:"Πιστοποιητικό Ανελκυστήρα",cat:"certificate",size:"78 KB",date:"2025-07-20"},
-    {id:"d7",bid:"b2",bname:"Ερμού 18",name:"Κανονισμός Πολυκατοικίας",cat:"contract",size:"198 KB",date:"2024-12-01"},
-    {id:"d8",bid:"b2",bname:"Ερμού 18",name:"Ασφαλιστήριο 2026",cat:"insurance",size:"980 KB",date:"2026-01-05"},
-    {id:"d9",bid:"b2",bname:"Ερμού 18",name:"Πρακτικά ΓΣ — Οκτ 2025",cat:"minutes",size:"102 KB",date:"2025-10-18"},
-  ],
-  monthlyData: [
-    {month:"Σεπ",income:2850,expenses:2640},{month:"Οκτ",income:2920,expenses:2780},
-    {month:"Νοε",income:3100,expenses:3350},{month:"Δεκ",income:3200,expenses:3050},
-    {month:"Ιαν",income:2950,expenses:2810},{month:"Φεβ",income:2780,expenses:2410},
-  ],
-};
+<section id="features" style="padding:80px 24px;">
+  <div style="max-width:1200px;margin:0 auto;">
+    <div class="reveal" style="text-align:center;margin-bottom:56px;">
+      <span class="badge" style="background:rgba(123,92,245,0.1);color:var(--purple);margin-bottom:16px;">Χαρακτηριστικά</span>
+      <h2 class="font-display" style="font-size:38px;font-weight:800;letter-spacing:-1px;margin-bottom:12px;">Όλα όσα χρειάζεστε,<br>σε μία πλατφόρμα</h2>
+      <p style="font-size:16px;color:var(--sec);max-width:520px;margin:0 auto;">Από τον υπολογισμό χιλιοστών μέχρι τις ηλεκτρονικές πληρωμές — χωρίς Excel, χωρίς χαρτιά.</p>
+    </div>
+    <div class="features-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;">
+      <div class="feature-card reveal">
+        <div style="width:44px;height:44px;border-radius:11px;background:rgba(74,141,248,0.1);display:flex;align-items:center;justify-content:center;margin-bottom:20px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8"><path d="M4 10h12M4 14h12M6 6c1.5-2 3.5-3 6-3 4.42 0 8 3.58 8 8s-3.58 8-8 8c-2.5 0-4.5-1-6-3"/></svg>
+        </div>
+        <h3 class="font-display" style="font-size:17px;font-weight:700;margin-bottom:8px;">Αυτόματος Υπολογισμός</h3>
+        <p style="font-size:14px;color:var(--sec);line-height:1.6;">Εισάγετε τα έξοδα, η πλατφόρμα υπολογίζει αυτόματα κάθε μερίδιο βάσει χιλιοστών. Ακρίβεια λεπτού.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div style="width:44px;height:44px;border-radius:11px;background:rgba(31,170,100,0.1);display:flex;align-items:center;justify-content:center;margin-bottom:20px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.8"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        </div>
+        <h3 class="font-display" style="font-size:17px;font-weight:700;margin-bottom:8px;">Online Πληρωμές</h3>
+        <p style="font-size:14px;color:var(--sec);line-height:1.6;">Κάρτα, IRIS, τραπεζικό έμβασμα. Ο ένοικος πατάει «Πληρωμή» και τελειώνει. Εσείς βλέπετε real-time.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div style="width:44px;height:44px;border-radius:11px;background:rgba(123,92,245,0.1);display:flex;align-items:center;justify-content:center;margin-bottom:20px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="1.8"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg>
+        </div>
+        <h3 class="font-display" style="font-size:17px;font-weight:700;margin-bottom:8px;">PDF Κατάσταση</h3>
+        <p style="font-size:14px;color:var(--sec);line-height:1.6;">Η γνωστή κατάσταση κοινοχρήστων — αυτοματοποιημένη. Αποστολή email ή εκτύπωση για τον πίνακα ανακοινώσεων.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div style="width:44px;height:44px;border-radius:11px;background:rgba(217,106,32,0.1);display:flex;align-items:center;justify-content:center;margin-bottom:20px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="1.8"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        </div>
+        <h3 class="font-display" style="font-size:17px;font-weight:700;margin-bottom:8px;">Αιτήματα Συντήρησης</h3>
+        <p style="font-size:14px;color:var(--sec);line-height:1.6;">Ο ένοικος υποβάλλει αίτημα, εσείς αναθέτετε τεχνικό, παρακολουθείτε σε πραγματικό χρόνο.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div style="width:44px;height:44px;border-radius:11px;background:rgba(219,160,16,0.1);display:flex;align-items:center;justify-content:center;margin-bottom:20px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--yellow)" stroke-width="1.8"><path d="m3 11 18-5v12L3 13v-2z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>
+        </div>
+        <h3 class="font-display" style="font-size:17px;font-weight:700;margin-bottom:8px;">Ανακοινώσεις</h3>
+        <p style="font-size:14px;color:var(--sec);line-height:1.6;">Ειδοποιήστε τους ενοίκους με ένα κλικ. Διακοπή νερού; ΓΣ; Νέος κανονισμός; Στέλνεται αμέσως.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div style="width:44px;height:44px;border-radius:11px;background:rgba(217,53,72,0.1);display:flex;align-items:center;justify-content:center;margin-bottom:20px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="1.8"><line x1="12" x2="12" y1="20" y2="10"/><line x1="18" x2="18" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="16"/></svg>
+        </div>
+        <h3 class="font-display" style="font-size:17px;font-weight:700;margin-bottom:8px;">Αναφορές & Στατιστικά</h3>
+        <p style="font-size:14px;color:var(--sec);line-height:1.6;">Έσοδα, έξοδα, ποσοστά είσπραξης, τάσεις ανά μήνα. Τα δεδομένα σας σε γραφήματα που μιλάνε.</p>
+      </div>
+    </div>
+  </div>
+</section>
 
-const MAINT_STATUS = {submitted:{l:"Υποβλήθηκε",c:"kyellow"},acknowledged:{l:"Αναγνωρίστηκε",c:"kaccent"},in_progress:{l:"Σε εξέλιξη",c:"korange"},resolved:{l:"Επιλύθηκε",c:"kgreen"},closed:{l:"Κλειστό",c:"kmut"},cancelled:{l:"Ακυρώθηκε",c:"kmut"}};
-const PRIORITY = {low:{l:"Χαμηλή",c:"kmut"},normal:{l:"Κανονική",c:"kaccent"},high:{l:"Υψηλή",c:"korange"},urgent:{l:"Επείγον",c:"kred"}};
-const DOC_CAT = {contract:{l:"Σύμβαση",c:"kaccent"},insurance:{l:"Ασφάλεια",c:"kgreen"},minutes:{l:"Πρακτικά",c:"kyellow"},certificate:{l:"Πιστοποιητικό",c:"kpurple"},other:{l:"Άλλο",c:"kmut"}};
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- HOW IT WORKS                                               -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<section id="how" style="padding:80px 24px;background:var(--bg2);">
+  <div style="max-width:1200px;margin:0 auto;">
+    <div class="reveal" style="text-align:center;margin-bottom:56px;">
+      <span class="badge" style="background:rgba(31,170,100,0.1);color:var(--green);margin-bottom:16px;">3 Απλά Βήματα</span>
+      <h2 class="font-display" style="font-size:38px;font-weight:800;letter-spacing:-1px;margin-bottom:12px;">Πώς λειτουργεί</h2>
+      <p style="font-size:16px;color:var(--sec);">Ξεκινάτε σε λιγότερο από 10 λεπτά.</p>
+    </div>
+    <div class="steps-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;">
+      <div class="reveal" style="text-align:center;">
+        <div style="width:56px;height:56px;border-radius:16px;background:var(--accent-g);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+          <span class="font-display" style="font-size:22px;font-weight:800;color:white;">1</span>
+        </div>
+        <h3 class="font-display" style="font-size:18px;font-weight:700;margin-bottom:8px;">Προσθέστε το κτίριο</h3>
+        <p style="font-size:14px;color:var(--sec);line-height:1.6;max-width:280px;margin:0 auto;">Εισάγετε τη διεύθυνση, τα διαμερίσματα, τα χιλιοστά κάθε μονάδας και τα στοιχεία ενοίκων.</p>
+      </div>
+      <div class="reveal">
+        <div style="text-align:center;">
+          <div style="width:56px;height:56px;border-radius:16px;background:var(--accent-g);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+            <span class="font-display" style="font-size:22px;font-weight:800;color:white;">2</span>
+          </div>
+          <h3 class="font-display" style="font-size:18px;font-weight:700;margin-bottom:8px;">Καταχωρήστε τα έξοδα</h3>
+          <p style="font-size:14px;color:var(--sec);line-height:1.6;max-width:280px;margin:0 auto;">ΔΕΗ, ΕΥΔΑΠ, καθαρισμός, ασανσέρ — ό,τι πληρώθηκε. Η πλατφόρμα κάνει τον μερισμό αυτόματα.</p>
+        </div>
+      </div>
+      <div class="reveal">
+        <div style="text-align:center;">
+          <div style="width:56px;height:56px;border-radius:16px;background:var(--accent-g);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+            <span class="font-display" style="font-size:22px;font-weight:800;color:white;">3</span>
+          </div>
+          <h3 class="font-display" style="font-size:18px;font-weight:700;margin-bottom:8px;">Στείλτε & Εισπράξτε</h3>
+          <p style="font-size:14px;color:var(--sec);line-height:1.6;max-width:280px;margin:0 auto;">Ένα κλικ στέλνει τον λογαριασμό με link πληρωμής. Οι ένοικοι πληρώνουν online. Εσείς παρακολουθείτε.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-// ─── Helpers ─────────────────────────────────────────────────
-const fmt = n => new Intl.NumberFormat('el-GR',{style:'currency',currency:'EUR'}).format(n);
-const fmtDate = d => new Date(d).toLocaleDateString('el-GR',{day:'numeric',month:'short',year:'numeric'});
-const badge = (text,color) => `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold text-${color} bg-${color}/10">${text}</span>`;
-const chip = (text,active,onclick) => `<button class="chip px-3 py-1 rounded-full text-[12px] border ${active?'active border-kaccent bg-kaccent/10 text-kaccent font-semibold':'border-kborder text-ksec'}" onclick="${onclick}">${text}</button>`;
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- PRICING                                                    -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<section id="pricing" style="padding:80px 24px;">
+  <div style="max-width:1200px;margin:0 auto;">
+    <div class="reveal" style="text-align:center;margin-bottom:56px;">
+      <span class="badge" style="background:rgba(74,141,248,0.1);color:var(--accent);margin-bottom:16px;">Τιμολόγηση</span>
+      <h2 class="font-display" style="font-size:38px;font-weight:800;letter-spacing:-1px;margin-bottom:12px;">Απλές, διαφανείς τιμές</h2>
+      <p style="font-size:16px;color:var(--sec);">Χωρίς κρυφές χρεώσεις. Ακυρώνετε όποτε θέλετε.</p>
+    </div>
+    <div class="pricing-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;align-items:start;">
+      <!-- Starter -->
+      <div class="pricing-card reveal">
+        <div style="font-size:13px;color:var(--mut);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Starter</div>
+        <div style="display:flex;align-items:baseline;gap:4px;margin-bottom:4px;">
+          <span class="font-display" style="font-size:36px;font-weight:800;">€19</span>
+          <span style="font-size:14px;color:var(--sec);">/μήνα</span>
+        </div>
+        <p style="font-size:13px;color:var(--mut);margin-bottom:24px;">Ιδανικό για μεμονωμένους διαχειριστές</p>
+        <div class="divider" style="margin-bottom:24px;"></div>
+        <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:28px;">
+          <div class="check-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Έως 3 κτίρια</div>
+          <div class="check-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Έως 30 μονάδες</div>
+          <div class="check-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Αυτόματος υπολογισμός</div>
+          <div class="check-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> PDF κατάσταση</div>
+          <div class="check-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Email υποστήριξη</div>
+        </div>
+        <a href="#login" class="btn-secondary" style="width:100%;justify-content:center;">Ξεκινήστε Δωρεάν</a>
+      </div>
 
-function calcBills(b) {
-  const tMill = b.units.reduce((s,u) => s+u.mill, 0);
-  const tExp = b.expenses.reduce((s,e) => s+e.amount, 0);
-  return b.units.map((u,i) => {
-    const share = u.mill / tMill;
-    const total = Math.round(tExp * share * 100) / 100;
-    const statuses = ['paid','pending','overdue','paid','paid','paid','pending','paid','overdue','paid'];
-    return { unit: u.label, tenant: u.tenant, mill: u.mill, share: (share*100).toFixed(1), total, status: u.occupied ? statuses[i % statuses.length] : 'pending' };
+      <!-- Professional (Featured) -->
+      <div class="pricing-card featured reveal">
+        <div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);">
+          <span style="background:var(--accent-g);color:white;font-size:11px;font-weight:700;padding:5px 16px;border-radius:50px;letter-spacing:0.5px;">ΔΗΜΟΦΙΛΕΣ</span>
+        </div>
+        <div style="font-size:13px;color:var(--accent);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Professional</div>
+        <div style="display:flex;align-items:baseline;gap:4px;margin-bottom:4px;">
+          <span class="font-display" style="font-size:36px;font-weight:800;">€49</span>
+          <span style="font-size:14px;color:var(--sec);">/μήνα</span>
+        </div>
+        <p style="font-size:13px;color:var(--mut);margin-bottom:24px;">Για επαγγελματίες διαχειριστές</p>
+        <div class="divider" style="margin-bottom:24px;"></div>
+        <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:28px;">
+          <div class="check-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Έως 15 κτίρια</div>
+          <div class="check-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Απεριόριστες μονάδες</div>
+          <div class="check-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Online πληρωμές</div>
+          <div class="check-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Αιτήματα συντήρησης</div>
+          <div class="check-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Ανακοινώσεις & Έγγραφα</div>
+          <div class="check-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Αναφορές & Στατιστικά</div>
+          <div class="check-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Έως 3 μέλη ομάδας</div>
+          <div class="check-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Προτεραιότητα υποστήριξης</div>
+        </div>
+        <a href="#login" class="btn-primary" style="width:100%;justify-content:center;">Ξεκινήστε Δωρεάν</a>
+      </div>
+
+      <!-- Enterprise -->
+      <div class="pricing-card reveal">
+        <div style="font-size:13px;color:var(--mut);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Enterprise</div>
+        <div style="display:flex;align-items:baseline;gap:4px;margin-bottom:4px;">
+          <span class="font-display" style="font-size:36px;font-weight:800;">€99</span>
+          <span style="font-size:14px;color:var(--sec);">/μήνα</span>
+        </div>
+        <p style="font-size:13px;color:var(--mut);margin-bottom:24px;">Για εταιρείες διαχείρισης ακινήτων</p>
+        <div class="divider" style="margin-bottom:24px;"></div>
+        <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:28px;">
+          <div class="check-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Απεριόριστα κτίρια</div>
+          <div class="check-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Απεριόριστες μονάδες</div>
+          <div class="check-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Ό,τι περιλαμβάνει το Professional</div>
+          <div class="check-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Απεριόριστα μέλη ομάδας</div>
+          <div class="check-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> API πρόσβαση</div>
+          <div class="check-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Dedicated account manager</div>
+          <div class="check-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> SLA 99.9% uptime</div>
+        </div>
+        <a href="#login" class="btn-secondary" style="width:100%;justify-content:center;">Επικοινωνήστε</a>
+      </div>
+    </div>
+    <p class="reveal" style="text-align:center;font-size:13px;color:var(--mut);margin-top:24px;">Όλα τα πακέτα ξεκινούν με 14 ημέρες δωρεάν δοκιμή. Δεν απαιτείται κάρτα.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- LOGIN / CTA                                                -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<section id="login" style="padding:80px 24px;background:var(--bg2);">
+  <div style="max-width:480px;margin:0 auto;">
+    <div class="reveal" style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:40px;text-align:center;">
+      <div style="width:48px;height:48px;border-radius:13px;background:var(--accent-g);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      </div>
+      <h2 class="font-display" style="font-size:24px;font-weight:800;margin-bottom:8px;">Συνδεθείτε στο Koinoxrista</h2>
+      <p style="font-size:14px;color:var(--sec);margin-bottom:28px;">Εισάγετε τα στοιχεία σας για σύνδεση ή δημιουργία λογαριασμού.</p>
+      <div style="display:flex;flex-direction:column;gap:12px;text-align:left;">
+        <div>
+          <label style="display:block;font-size:12px;font-weight:600;color:var(--sec);margin-bottom:6px;">Email</label>
+          <input type="email" placeholder="you@example.com" style="width:100%;padding:11px 14px;background:var(--bg);border:1px solid var(--border);border-radius:9px;color:var(--text);font-size:14px;font-family:inherit;outline:none;transition:border-color 0.2s;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
+        </div>
+        <div>
+          <label style="display:block;font-size:12px;font-weight:600;color:var(--sec);margin-bottom:6px;">Κωδικός</label>
+          <input type="password" placeholder="••••••••" style="width:100%;padding:11px 14px;background:var(--bg);border:1px solid var(--border);border-radius:9px;color:var(--text);font-size:14px;font-family:inherit;outline:none;transition:border-color 0.2s;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
+        </div>
+        <button class="btn-primary" style="width:100%;justify-content:center;margin-top:4px;padding:13px;font-size:15px;border-radius:10px;">Σύνδεση</button>
+        <div style="text-align:center;margin-top:4px;">
+          <a href="#" style="font-size:13px;color:var(--accent);text-decoration:none;">Ξεχάσατε τον κωδικό;</a>
+        </div>
+      </div>
+      <div style="margin-top:24px;padding-top:24px;border-top:1px solid var(--border);">
+        <p style="font-size:13px;color:var(--mut);">Δεν έχετε λογαριασμό; <a href="#" style="color:var(--accent);text-decoration:none;font-weight:600;">Εγγραφή δωρεάν →</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- FOOTER                                                     -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<footer style="padding:60px 24px 32px;border-top:1px solid var(--border);">
+  <div style="max-width:1200px;margin:0 auto;">
+    <div class="footer-grid" style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;margin-bottom:48px;">
+      <div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+          <div style="width:32px;height:32px;border-radius:9px;background:var(--accent-g);display:flex;align-items:center;justify-content:center;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          </div>
+          <span class="font-display" style="font-size:17px;font-weight:700;">Koinoxrista</span>
+        </div>
+        <p style="font-size:13px;color:var(--mut);line-height:1.6;max-width:280px;">Η σύγχρονη πλατφόρμα διαχείρισης κοινοχρήστων για Ελλάδα. Ψηφιοποιούμε τη σχέση κτιρίου-ενοίκου.</p>
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:600;color:var(--mut);text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;">Προϊόν</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <a href="#features" style="font-size:13px;color:var(--sec);text-decoration:none;">Χαρακτηριστικά</a>
+          <a href="#pricing" style="font-size:13px;color:var(--sec);text-decoration:none;">Τιμές</a>
+          <a href="#how" style="font-size:13px;color:var(--sec);text-decoration:none;">Πώς Λειτουργεί</a>
+          <a href="#" style="font-size:13px;color:var(--sec);text-decoration:none;">Changelog</a>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:600;color:var(--mut);text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;">Εταιρεία</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <a href="#" style="font-size:13px;color:var(--sec);text-decoration:none;">Σχετικά</a>
+          <a href="#" style="font-size:13px;color:var(--sec);text-decoration:none;">Blog</a>
+          <a href="#" style="font-size:13px;color:var(--sec);text-decoration:none;">Καριέρες</a>
+          <a href="#" style="font-size:13px;color:var(--sec);text-decoration:none;">Επικοινωνία</a>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:600;color:var(--mut);text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;">Νομικά</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <a href="#" style="font-size:13px;color:var(--sec);text-decoration:none;">Όροι Χρήσης</a>
+          <a href="#" style="font-size:13px;color:var(--sec);text-decoration:none;">Πολιτική Απορρήτου</a>
+          <a href="#" style="font-size:13px;color:var(--sec);text-decoration:none;">GDPR</a>
+          <a href="#" style="font-size:13px;color:var(--sec);text-decoration:none;">Cookies</a>
+        </div>
+      </div>
+    </div>
+    <div class="divider" style="margin-bottom:24px;"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+      <p style="font-size:12px;color:var(--mut);">© 2026 Koinoxrista. Με επιφύλαξη παντός δικαιώματος.</p>
+      <p style="font-size:12px;color:var(--mut);">Κατασκευή με ❤️ στην Ελλάδα</p>
+    </div>
+  </div>
+</footer>
+
+<!-- ═══ Scroll Reveal JS ═══ -->
+<script>
+  // Reveal on scroll
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('visible'); } });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // Mobile nav toggle
+  document.querySelectorAll('#mobile-nav a').forEach(a => {
+    a.addEventListener('click', () => document.getElementById('mobile-nav').classList.add('hidden'));
   });
-}
 
-// ─── Navigation ──────────────────────────────────────────────
-let currentPage = 'dashboard';
-let state = { buildingFilter: 'all', tenantRole: 'all', maintStatus: 'all', docCat: 'all' };
+  // Smooth hide mobile nav class
+  const style = document.createElement('style');
+  style.textContent = '.hidden { display: none !important; }';
+  document.head.appendChild(style);
+</script>
 
-function navigateTo(page, param) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-
-  const navKey = page === 'building-detail' ? 'buildings' : page;
-  document.querySelector(`[data-nav="${navKey}"]`)?.classList.add('active');
-
-  currentPage = page;
-  document.getElementById(`page-${page}`)?.classList.add('active');
-
-  // Render dynamic pages
-  if (page === 'buildings') renderBuildings();
-  if (page === 'building-detail') renderBuildingDetail(param);
-  if (page === 'tenants') renderTenants();
-  if (page === 'billing') renderBilling();
-  if (page === 'announcements') renderAnnouncements();
-  if (page === 'maintenance') renderMaintenance();
-  if (page === 'documents') renderDocuments();
-  if (page === 'reports') renderReports();
-
-  window.scrollTo(0, 0);
-}
-
-
-// ─── Sliding Logic ──────────────────────────────────────────────
-  function toggleSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('sidebar-overlay');
-    
-    // Toggle the slide effect
-    sidebar.classList.toggle('-translate-x-full');
-    
-    // Toggle the dark overlay
-    overlay.classList.toggle('hidden');
-  }
-
-  // Optional but recommended: 
-  // Update your existing navigateTo() function to also close the sidebar on mobile when a link is clicked!
-  function closeSidebarOnMobile() {
-    if (window.innerWidth < 768) { // 768px is Tailwind's 'md' breakpoint
-      const sidebar = document.getElementById('sidebar');
-      if (!sidebar.classList.contains('-translate-x-full')) {
-        toggleSidebar();
-      }
-    }
-  }
-
-// ─── Render: Buildings Grid ──────────────────────────────────
-function renderBuildings() {
-  const el = document.getElementById('buildings-grid');
-  el.innerHTML = DATA.buildings.map(b => {
-    const bills = calcBills(b);
-    const out = bills.filter(bi => bi.status !== 'paid').reduce((s,bi) => s+bi.total, 0);
-    const tags = [b.hasElevator?'Ασανσέρ':null, b.hasCentralHeating?'Κεντρ. Θέρμανση':null].filter(Boolean);
-    return `<div class="bg-kcard border border-kborder rounded-xl p-5 cursor-pointer card-hover" onclick="navigateTo('building-detail','${b.id}')">
-      <div class="flex justify-between mb-3.5"><div class="flex gap-2.5"><div class="w-10 h-10 rounded-lg bg-kaccent/10 flex items-center justify-center text-kaccent"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22V12h6v10"/></svg></div><div><div class="text-[14px] font-semibold">${b.name}</div><div class="text-[11px] text-kmut">${b.address}</div></div></div><svg class="text-ksec" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
-      <div class="grid grid-cols-3 gap-3 mb-3"><div><div class="text-[10.5px] text-kmut">Μονάδες</div><div class="text-[17px] font-bold">${b.units.length}</div></div><div><div class="text-[10.5px] text-kmut">Όροφοι</div><div class="text-[17px] font-bold">${b.floors}</div></div><div><div class="text-[10.5px] text-kmut">Εκκρεμή</div><div class="text-[15px] font-bold font-mono text-kyellow">${fmt(out)}</div></div></div>
-      <div class="flex gap-1.5">${tags.map(t => `<span class="px-2 py-0.5 rounded-md text-[11px] font-medium bg-kaccent/10 text-kaccent">${t}</span>`).join('')}</div>
-    </div>`;
-  }).join('');
-}
-
-// ─── Render: Building Detail ─────────────────────────────────
-function renderBuildingDetail(id) {
-  const b = DATA.buildings.find(x => x.id === id);
-  if (!b) return;
-  const bills = calcBills(b);
-  const tExp = b.expenses.reduce((s,e) => s+e.amount, 0);
-  const collected = bills.filter(bi => bi.status === 'paid').reduce((s,bi) => s+bi.total, 0);
-  const outstanding = bills.filter(bi => bi.status !== 'paid').reduce((s,bi) => s+bi.total, 0);
-
-  const el = document.getElementById('building-detail-content');
-  el.innerHTML = `
-    <div class="flex justify-between items-start mb-5">
-      <div><h1 class="text-[22px] font-bold tracking-tight mb-1">${b.name}</h1><p class="text-[13px] text-ksec">${b.address}</p></div>
-      <div class="flex gap-2"><button class="flex items-center gap-1.5 border border-kborder text-ksec px-3 py-1.5 rounded-lg text-[12.5px] font-semibold hover:border-kaccent transition">Εκτύπωση</button><button class="flex items-center gap-1.5 bg-kaccent text-white px-3.5 py-1.5 rounded-lg text-[12.5px] font-semibold">Υπολογισμός</button></div>
-    </div>
-    <div class="grid grid-cols-4 gap-3 mb-6">
-      <div class="bg-kcard border border-kborder rounded-xl p-4"><div class="text-[10.5px] text-kmut font-medium uppercase tracking-wider mb-1.5">Μονάδες</div><div class="text-[24px] font-bold">${b.units.length}</div><div class="text-[12px] text-ksec mt-0.5">${b.floors} όροφοι</div></div>
-      <div class="bg-kcard border border-kborder rounded-xl p-4"><div class="text-[10.5px] text-kmut font-medium uppercase tracking-wider mb-1.5">Έξοδα</div><div class="text-[24px] font-bold text-kaccent">${fmt(tExp)}</div><div class="text-[12px] text-ksec mt-0.5">Φεβ 2026</div></div>
-      <div class="bg-kcard border border-kborder rounded-xl p-4"><div class="text-[10.5px] text-kmut font-medium uppercase tracking-wider mb-1.5">Εισπράχθηκαν</div><div class="text-[24px] font-bold text-kgreen">${fmt(collected)}</div></div>
-      <div class="bg-kcard border border-kborder rounded-xl p-4"><div class="text-[10.5px] text-kmut font-medium uppercase tracking-wider mb-1.5">Εκκρεμή</div><div class="text-[24px] font-bold text-kyellow">${fmt(outstanding)}</div></div>
-    </div>
-    <!-- Tabs -->
-    <div class="flex gap-1 border-b border-kborder mb-5" id="bd-tabs">
-      <button onclick="switchBdTab('units','${id}')" class="bd-tab px-4 py-2.5 text-[13px] font-semibold text-kaccent border-b-2 border-kaccent" data-tab="units">Μονάδες & Ένοικοι</button>
-      <button onclick="switchBdTab('expenses','${id}')" class="bd-tab px-4 py-2.5 text-[13px] text-ksec border-b-2 border-transparent" data-tab="expenses">Έξοδα</button>
-      <button onclick="switchBdTab('bills','${id}')" class="bd-tab px-4 py-2.5 text-[13px] text-ksec border-b-2 border-transparent" data-tab="bills">Κοινόχρηστα</button>
-    </div>
-    <div id="bd-tab-content"></div>`;
-  switchBdTab('units', id);
-}
-
-function switchBdTab(tab, bid) {
-  document.querySelectorAll('.bd-tab').forEach(t => { t.classList.remove('text-kaccent','font-semibold','border-kaccent'); t.classList.add('text-ksec','border-transparent'); });
-  document.querySelector(`.bd-tab[data-tab="${tab}"]`)?.classList.add('text-kaccent','font-semibold','border-kaccent');
-  document.querySelector(`.bd-tab[data-tab="${tab}"]`)?.classList.remove('text-ksec','border-transparent');
-  const b = DATA.buildings.find(x => x.id === bid);
-  const el = document.getElementById('bd-tab-content');
-
-  if (tab === 'units') {
-    el.innerHTML = `<div class="bg-kcard border border-kborder rounded-xl overflow-hidden"><table class="w-full"><thead><tr class="border-b border-kborder"><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Μονάδα</th><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Όροφος</th><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">τ.μ.</th><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Χιλιοστά</th><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Ένοικος</th><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Κατάσταση</th></tr></thead><tbody>${b.units.sort((a,c) => a.floor - c.floor).map(u =>
-      `<tr class="border-b border-kborder last:border-0 row-hover"><td class="px-5 py-2.5 text-[13px] font-medium">${u.label}</td><td class="px-5 py-2.5 text-[13px] text-ksec">${u.floor===0?'Ισόγειο':u.floor+'ος'}</td><td class="px-5 py-2.5 text-[13px] text-ksec font-mono">${u.sqm}</td><td class="px-5 py-2.5 text-[13px] text-kaccent font-mono">${u.mill}</td><td class="px-5 py-2.5 text-[13px] text-ksec">${u.tenant ? `<div class="flex items-center gap-2"><div class="w-6 h-6 rounded-full bg-gradient-to-br from-kaccent to-kaccentd flex items-center justify-center text-white text-[10px] font-bold">${u.tenant.name[0]}</div>${u.tenant.name}</div>` : '<span class="text-kmut italic">Κενό</span>'}</td><td class="px-5 py-2.5">${badge(u.occupied?'Κατοικημένο':'Κενό', u.occupied?'kgreen':'kmut')}</td></tr>`
-    ).join('')}</tbody></table></div>`;
-  } else if (tab === 'expenses') {
-    const tExp = b.expenses.reduce((s,e) => s+e.amount, 0);
-    el.innerHTML = `<div class="bg-kcard border border-kborder rounded-xl overflow-hidden"><table class="w-full"><thead><tr class="border-b border-kborder"><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Κατηγορία</th><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Περιγραφή</th><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Κατανομή</th><th class="text-right px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Ποσό</th></tr></thead><tbody>${b.expenses.map(e =>
-      `<tr class="border-b border-kborder"><td class="px-5 py-2.5 text-[13px] font-medium">${e.cat}</td><td class="px-5 py-2.5 text-[13px] text-ksec">${e.desc}</td><td class="px-5 py-2.5"><span class="px-2 py-0.5 rounded-md text-[11px] font-medium bg-kaccent/10 text-kaccent">Χιλιοστά</span></td><td class="px-5 py-2.5 text-right text-[13px] font-semibold font-mono">${fmt(e.amount)}</td></tr>`
-    ).join('')}<tr><td colspan="3" class="px-5 py-3 text-[14px] font-bold">Σύνολο</td><td class="px-5 py-3 text-right text-[15px] font-bold font-mono text-kaccent">${fmt(tExp)}</td></tr></tbody></table></div>`;
-  } else if (tab === 'bills') {
-    const bills = calcBills(b);
-    const statusBadge = s => ({ paid: badge('Πληρώθηκε','kgreen'), pending: badge('Εκκρεμεί','kyellow'), overdue: badge('Ληξιπρόθεσμο','kred') })[s];
-    el.innerHTML = `<div class="bg-kcard border border-kborder rounded-xl overflow-hidden"><table class="w-full"><thead><tr class="border-b border-kborder"><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Μονάδα</th><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Ένοικος</th><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Χιλιοστά</th><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Μερίδιο</th><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Κατάσταση</th><th class="text-right px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Ποσό</th></tr></thead><tbody>${bills.map(bi =>
-      `<tr class="border-b border-kborder last:border-0 row-hover"><td class="px-5 py-2.5 text-[13px] font-medium">${bi.unit}</td><td class="px-5 py-2.5 text-[13px] text-ksec">${bi.tenant?.name||'—'}</td><td class="px-5 py-2.5 text-[13px] font-mono text-ksec">${bi.mill}</td><td class="px-5 py-2.5 text-[13px] font-mono text-ksec">${bi.share}%</td><td class="px-5 py-2.5">${statusBadge(bi.status)}</td><td class="px-5 py-2.5 text-right text-[13px] font-semibold font-mono">${fmt(bi.total)}</td></tr>`
-    ).join('')}</tbody></table></div>`;
-  }
-}
-
-// ─── Render: Tenants ─────────────────────────────────────────
-function renderTenants() {
-  const search = document.getElementById('tenant-search')?.value?.toLowerCase() || '';
-  const all = DATA.buildings.flatMap(b => b.units.filter(u => u.tenant).map(u => ({...u.tenant, building: b.name, unit: u.label})));
-  const filtered = all.filter(t => (state.tenantRole === 'all' || t.role === state.tenantRole) && (search === '' || t.name.toLowerCase().includes(search) || t.email.toLowerCase().includes(search)));
-
-  document.getElementById('tenant-filters').innerHTML = [
-    chip('Όλοι', state.tenantRole==='all', "state.tenantRole='all';renderTenants()"),
-    chip('Ενοικιαστές', state.tenantRole==='renter', "state.tenantRole='renter';renderTenants()"),
-    chip('Ιδιοκτήτες', state.tenantRole==='owner', "state.tenantRole='owner';renderTenants()"),
-  ].join('');
-
-  document.getElementById('tenants-table-wrap').innerHTML = `<table class="w-full"><thead><tr class="border-b border-kborder"><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Όνομα</th><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Κτίριο</th><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Μονάδα</th><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Ρόλος</th><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Email</th><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Τηλέφωνο</th></tr></thead><tbody>${filtered.map(t =>
-    `<tr class="border-b border-kborder last:border-0 row-hover"><td class="px-5 py-2.5"><div class="flex items-center gap-2.5"><div class="w-7 h-7 rounded-full bg-gradient-to-br from-kaccent to-kaccentd flex items-center justify-center text-white text-[10px] font-bold">${t.name[0]}</div><span class="text-[13px] font-medium">${t.name}</span></div></td><td class="px-5 py-2.5 text-[13px] text-ksec">${t.building}</td><td class="px-5 py-2.5 text-[13px] text-ksec">${t.unit}</td><td class="px-5 py-2.5">${badge(t.role==='owner'?'Ιδιοκτήτης':'Ενοικιαστής', t.role==='owner'?'kaccent':'kgreen')}</td><td class="px-5 py-2.5 text-[12px] text-ksec">${t.email}</td><td class="px-5 py-2.5 text-[12px] text-ksec font-mono">${t.phone}</td></tr>`
-  ).join('')}</tbody></table>`;
-}
-
-// ─── Render: Billing ─────────────────────────────────────────
-function renderBilling() {
-  document.getElementById('billing-list').innerHTML = DATA.buildings.map(b => {
-    const bills = calcBills(b);
-    const tExp = b.expenses.reduce((s,e) => s+e.amount, 0);
-    const paid = bills.filter(bi => bi.status === 'paid').length;
-    const pct = Math.round((paid / bills.length) * 100);
-    return `<div class="bg-kcard border border-kborder rounded-xl overflow-hidden cursor-pointer card-hover" onclick="navigateTo('building-detail','${b.id}')">
-      <div class="flex justify-between items-center px-5 py-3.5 border-b border-kborder"><div class="flex items-center gap-2.5"><div class="w-9 h-9 rounded-lg bg-kaccent/10 flex items-center justify-center text-kaccent"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22V12h6v10"/></svg></div><div><div class="text-[13px] font-semibold">${b.name}</div><div class="text-[11px] text-kmut">Φεβ 2026 • ${b.expenses.length} έξοδα</div></div></div><div class="flex items-center gap-5"><div class="text-right"><div class="font-mono font-bold text-kaccent">${fmt(tExp)}</div><div class="text-[11px] text-kmut">${paid}/${bills.length} πληρωμένα</div></div><svg class="text-ksec" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div></div>
-      <div class="px-5 py-2.5"><div class="h-[5px] rounded-full bg-kbg overflow-hidden"><div class="h-full rounded-full bg-gradient-to-r from-kgreen to-emerald-400 progress-animate" style="width:${pct}%"></div></div></div>
-    </div>`;
-  }).join('');
-}
-
-// ─── Render: Announcements ───────────────────────────────────
-function renderAnnouncements() {
-  const filtered = DATA.announcements.filter(a => state.buildingFilter === 'all' || a.bid === state.buildingFilter);
-  document.getElementById('announcement-filters').innerHTML = [
-    chip('Όλα', state.buildingFilter==='all', "state.buildingFilter='all';renderAnnouncements()"),
-    ...DATA.buildings.map(b => chip(b.name, state.buildingFilter===b.id, `state.buildingFilter='${b.id}';renderAnnouncements()`))
-  ].join('');
-
-  const priColor = {urgent:'border-l-kred',high:'border-l-korange',normal:'border-l-kaccent',low:'border-l-kmut'};
-  document.getElementById('announcements-list').innerHTML = filtered.map(a => `
-    <div class="bg-kcard border border-kborder rounded-xl overflow-hidden border-l-[3px] ${priColor[a.priority]}">
-      <div class="p-5">
-        <div class="flex justify-between items-start mb-2">
-          <div class="flex items-center gap-2 flex-wrap">
-            ${a.pinned ? '<span class="text-[11px] font-semibold text-kaccent flex items-center gap-1"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><line x1="12" x2="12" y1="17" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg>Καρφ.</span>' : ''}
-            ${badge(PRIORITY[a.priority].l, PRIORITY[a.priority].c)}
-            <span class="px-2 py-0.5 rounded-md text-[11px] font-medium bg-kbg text-ksec">${a.bname}</span>
-          </div>
-          <span class="text-[11px] text-kmut flex-shrink-0">${fmtDate(a.date)}</span>
-        </div>
-        <div class="text-[15px] font-semibold mb-1.5">${a.title}</div>
-        <div class="text-[13px] text-ksec leading-relaxed">${a.body}</div>
-      </div>
-    </div>
-  `).join('');
-}
-
-// ─── Render: Maintenance ─────────────────────────────────────
-function renderMaintenance() {
-  const filtered = DATA.maintenance.filter(m => (state.buildingFilter === 'all' || m.bid === state.buildingFilter) && (state.maintStatus === 'all' || m.status === state.maintStatus));
-  document.getElementById('maint-filters').innerHTML = [
-    chip('Όλα κτίρια', state.buildingFilter==='all', "state.buildingFilter='all';renderMaintenance()"),
-    ...DATA.buildings.map(b => chip(b.name, state.buildingFilter===b.id, `state.buildingFilter='${b.id}';renderMaintenance()`)),
-    '<div class="w-px bg-kborder mx-1"></div>',
-    chip('Όλες', state.maintStatus==='all', "state.maintStatus='all';renderMaintenance()"),
-    chip('Υποβλήθηκε', state.maintStatus==='submitted', "state.maintStatus='submitted';renderMaintenance()"),
-    chip('Σε εξέλιξη', state.maintStatus==='in_progress', "state.maintStatus='in_progress';renderMaintenance()"),
-    chip('Επιλυμένα', state.maintStatus==='resolved', "state.maintStatus='resolved';renderMaintenance()"),
-  ].join('');
-
-  document.getElementById('maint-table-wrap').innerHTML = `<table class="w-full"><thead><tr class="border-b border-kborder"><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Αίτημα</th><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Κτίριο</th><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Μονάδα</th><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Προτ.</th><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Κατάσταση</th><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Ανατέθηκε</th><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Ημ/νία</th></tr></thead><tbody>${filtered.map(m => {
-    const ms = MAINT_STATUS[m.status]; const pr = PRIORITY[m.priority];
-    return `<tr class="border-b border-kborder last:border-0 row-hover"><td class="px-5 py-2.5"><div class="text-[13px] font-medium">${m.title}</div><div class="text-[11px] text-kmut mt-0.5">${m.desc.slice(0,55)}...</div></td><td class="px-5 py-2.5 text-[13px] text-ksec">${m.bname}</td><td class="px-5 py-2.5 text-[13px] text-ksec">${m.unit||'<span class="text-kmut">Κοινόχρ.</span>'}</td><td class="px-5 py-2.5"><span class="text-[12px] font-semibold text-${pr.c}">${pr.l}</span></td><td class="px-5 py-2.5">${badge(ms.l, ms.c)}</td><td class="px-5 py-2.5 text-[13px] text-ksec">${m.assigned||'<span class="text-kmut">—</span>'}</td><td class="px-5 py-2.5 text-[12px] text-ksec">${fmtDate(m.date)}</td></tr>`;
-  }).join('')}</tbody></table>`;
-}
-
-// ─── Render: Documents ───────────────────────────────────────
-function renderDocuments() {
-  const filtered = DATA.documents.filter(d => (state.buildingFilter === 'all' || d.bid === state.buildingFilter) && (state.docCat === 'all' || d.cat === state.docCat));
-  document.getElementById('doc-filters').innerHTML = [
-    chip('Όλα κτίρια', state.buildingFilter==='all', "state.buildingFilter='all';renderDocuments()"),
-    ...DATA.buildings.map(b => chip(b.name, state.buildingFilter===b.id, `state.buildingFilter='${b.id}';renderDocuments()`)),
-    '<div class="w-px bg-kborder mx-1"></div>',
-    chip('Όλα', state.docCat==='all', "state.docCat='all';renderDocuments()"),
-    ...Object.entries(DOC_CAT).map(([k,v]) => chip(v.l, state.docCat===k, `state.docCat='${k}';renderDocuments()`)),
-  ].join('');
-
-  document.getElementById('docs-table-wrap').innerHTML = `<table class="w-full"><thead><tr class="border-b border-kborder"><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Έγγραφο</th><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Κτίριο</th><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Κατηγορία</th><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Μέγεθος</th><th class="text-left px-5 py-2.5 text-[10.5px] font-semibold text-kmut uppercase tracking-wider">Ημ/νία</th><th class="px-5 py-2.5 w-10"></th></tr></thead><tbody>${filtered.map(d => {
-    const dc = DOC_CAT[d.cat] || DOC_CAT.other;
-    return `<tr class="border-b border-kborder last:border-0 row-hover"><td class="px-5 py-2.5"><div class="flex items-center gap-2.5"><div class="w-8 h-8 rounded-md bg-kred/10 flex items-center justify-center text-kred text-[10px] font-bold">PDF</div><span class="text-[13px] font-medium">${d.name}</span></div></td><td class="px-5 py-2.5 text-[13px] text-ksec">${d.bname}</td><td class="px-5 py-2.5">${badge(dc.l, dc.c)}</td><td class="px-5 py-2.5 text-[12px] text-ksec font-mono">${d.size}</td><td class="px-5 py-2.5 text-[12px] text-ksec">${fmtDate(d.date)}</td><td class="px-5 py-2.5"><button class="text-ksec hover:text-kaccent transition"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg></button></td></tr>`;
-  }).join('')}</tbody></table>`;
-}
-
-// ─── Render: Reports Chart ───────────────────────────────────
-function renderReports() {
-  const max = Math.max(...DATA.monthlyData.flatMap(d => [d.income, d.expenses]));
-  document.getElementById('chart-container').innerHTML = `<div class="flex items-end gap-2 h-[180px]">${DATA.monthlyData.map(d => `
-    <div class="flex-1 flex flex-col items-center gap-1">
-      <div class="flex gap-1 items-end h-[150px] w-full">
-        <div class="flex-1 bg-kgreen rounded-t bar-animate opacity-80" style="height:${(d.income/max)*100}%" title="Έσοδα: ${fmt(d.income)}"></div>
-        <div class="flex-1 bg-kaccent rounded-t bar-animate opacity-80" style="height:${(d.expenses/max)*100}%" title="Έξοδα: ${fmt(d.expenses)}"></div>
-      </div>
-      <span class="text-[11px] text-kmut font-medium">${d.month}</span>
-    </div>`).join('')}</div>`;
-
-  // Expense categories
-  const allExp = DATA.buildings.flatMap(b => b.expenses);
-  const cats = {};
-  allExp.forEach(e => cats[e.cat] = (cats[e.cat]||0) + e.amount);
-  const sorted = Object.entries(cats).sort((a,b) => b[1]-a[1]);
-  const total = sorted.reduce((s,[,v]) => s+v, 0);
-  const colors = ['kaccent','kgreen','korange','kpurple','kyellow','kred','kmut'];
-  document.getElementById('expense-categories').innerHTML = sorted.map(([cat,amount], i) => {
-    const pct = Math.round((amount/total)*100);
-    return `<div class="flex items-center gap-3 py-2 ${i<sorted.length-1?'border-b border-kborder':''}">
-      <div class="w-2.5 h-2.5 rounded bg-${colors[i%colors.length]} flex-shrink-0"></div>
-      <div class="flex-1 text-[13px]">${cat}</div>
-      <div class="w-32"><div class="h-1.5 rounded-full bg-kbg"><div class="h-full rounded-full bg-${colors[i%colors.length]} opacity-70 progress-animate" style="width:${pct}%"></div></div></div>
-      <div class="w-20 text-right font-mono text-[12px] font-semibold">${fmt(amount)}</div>
-      <div class="w-9 text-right text-[11px] text-kmut">${pct}%</div>
-    </div>`;
-  }).join('');
-}
-
-// ─── Settings tabs ───────────────────────────────────────────
-function switchSettingsTab(tab) {
-  document.querySelectorAll('.settings-tab').forEach(t => { t.classList.remove('text-kaccent','font-semibold','border-kaccent'); t.classList.add('text-ksec','border-transparent'); });
-  document.querySelector(`.settings-tab[data-tab="${tab}"]`)?.classList.add('text-kaccent','font-semibold','border-kaccent');
-  document.querySelector(`.settings-tab[data-tab="${tab}"]`)?.classList.remove('text-ksec','border-transparent');
-  const el = document.getElementById('settings-tab-content');
-}
+</body>
+</html>
