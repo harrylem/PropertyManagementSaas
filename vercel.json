@@ -3,6 +3,8 @@
   "installCommand": "npm install",
   "outputDirectory": "public",
   "rewrites": [
-    { "source": "/app", "destination": "/app.html" }
+    { "source": "/index", "destination": "/index.html"},
+    { "source": "/app", "destination": "/app.html"},
+    { "source": "/tenant", "destination": "/tenant.html"}
   ]
 }
