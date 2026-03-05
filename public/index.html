@@ -416,8 +416,15 @@
       <div style="width:48px;height:48px;border-radius:13px;background:var(--accent-g);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
       </div>
-      <h2 class="font-display" style="font-size:24px;font-weight:800;margin-bottom:8px;">Συνδεθείτε στο Koinoxrista</h2>
+      <h2 class="font-display" style="font-size:24px;font-weight:800;margin-bottom:8px;">Συνδεθείτε στο App Name</h2>
       <p style="font-size:14px;color:var(--sec);margin-bottom:28px;">Εισάγετε τα στοιχεία σας για σύνδεση ή δημιουργία λογαριασμού.</p>
+      <div style="margin-bottom: 16px;">
+        <label style="display:block; font-size:13px; color:var(--mut); margin-bottom:6px;">Σύνδεση ως</label>
+        <select id="mock-login-role" style="width:100%; padding:12px 14px; background:var(--bg); border:1px solid var(--border); border-radius:10px; color:var(--text); font-size:14px; outline:none; appearance:auto;">
+          <option value="manager">Διαχειριστής (Manager Panel)</option>
+          <option value="tenant">Ένοικος (Tenant Panel)</option>
+        </select>
+      </div>
       <div style="display:flex;flex-direction:column;gap:12px;text-align:left;">
         <div>
           <label style="display:block;font-size:12px;font-weight:600;color:var(--sec);margin-bottom:6px;">Email</label>
@@ -427,7 +434,7 @@
           <label style="display:block;font-size:12px;font-weight:600;color:var(--sec);margin-bottom:6px;">Κωδικός</label>
           <input type="password" placeholder="••••••••" style="width:100%;padding:11px 14px;background:var(--bg);border:1px solid var(--border);border-radius:9px;color:var(--text);font-size:14px;font-family:inherit;outline:none;transition:border-color 0.2s;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
         </div>
-        <button class="btn-primary" style="width:100%;justify-content:center;margin-top:4px;padding:13px;font-size:15px;border-radius:10px;">Σύνδεση</button>
+        <button id="login-submit-btn" onclick="handleMockLogin(event)" class="btn-primary" style="width:100%;justify-content:center;margin-top:4px;padding:13px;font-size:15px;border-radius:10px;">Σύνδεση</button>
         <div style="text-align:center;margin-top:4px;">
           <a href="#" style="font-size:13px;color:var(--accent);text-decoration:none;">Ξεχάσατε τον κωδικό;</a>
         </div>
@@ -509,5 +516,45 @@
   document.head.appendChild(style);
 </script>
 
+<script>
+ function handleMockLogin(event) {
+  // 1. Stop the page from reloading
+  event.preventDefault(); 
+
+  // 2. Get the selected role and the button
+  const role = document.getElementById('mock-login-role').value;
+  const btn = document.getElementById('login-submit-btn');
+  
+  // 3. Fake a loading state so it feels real
+  const originalText = btn.innerText;
+  btn.innerText = 'Σύνδεση...';
+  btn.style.opacity = '0.7';
+  btn.style.pointerEvents = 'none';
+
+  // 4. Redirect after a short delay
+  setTimeout(() => {
+    if (role === 'manager') {
+      // Go to Manager Dashboard
+      window.location.href = 'app.html'; // Use '/app' if testing via Vercel deployment
+    } else {
+      // Go to Tenant Panel
+      window.location.href = 'tenant.html'; // Use '/tenant' if testing via Vercel deployment
+    }
+  }, 600); // 600 millisecond delay
+}
+
+  // Listen for the page being restored from the browser's Back button cache
+  window.addEventListener('pageshow', function(event) {
+    if (event.persisted) {
+      const btn = document.getElementById('login-submit-btn');
+    if (btn) {
+      // Revert the button back to its original state
+       btn.innerText = 'Σύνδεση';
+       btn.style.opacity = '1';
+       btn.style.pointerEvents = 'auto';
+     }
+   }
+ });
+</script>
 </body>
 </html>
