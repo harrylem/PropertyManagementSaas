@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Base dark theme ── */
+body {
+  background: #0c0d12;
+  color: #e4e5eb;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #252838; border-radius: 3px; }
+
+/* ── Overscroll ── */
+html, body { overscroll-behavior: none; -webkit-tap-highlight-color: transparent; }
